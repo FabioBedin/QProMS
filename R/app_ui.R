@@ -5,10 +5,43 @@
 #' @import shiny
 #' @noRd
 app_ui <- function(request) {
+
+  options <- list(
+    sectionsColor = c('#262222', '#262222'),
+    scrollingSpeed = 1000,
+    loopBottom = FALSE,
+    loopTop = FALSE,
+    loopHorizontal = FALSE,
+    scrollHorizontally = FALSE,
+    resetSliders = FALSE,
+    navigationPosition = "none",
+    responsiveSlides = TRUE,
+    controlArrows = FALSE
+  )
+
   tagList(
     # Leave this function for adding external resources
     golem_add_external_resources(),
     # Your application UI logic
+
+    shiny::bootstrapPage(
+      theme = bslib::bs_theme(
+        version = 5,
+        primary = "#75BC56",
+        secondary = "#e6e2dd"
+        # bg = "#262222"
+      ),
+
+      fullPage::fullPage(
+        opts = options,
+        menu = NULL,
+        fullPage::fullSection(
+          class = "pt-0",
+          mod_home_page_ui("home_page_1")
+        )
+      )
+
+    )
 
   )
 }

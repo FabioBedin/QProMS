@@ -6,7 +6,9 @@ Authors@R:
 Description: Data analysis application suited for MaxQuant output.
 License: MIT + file LICENSE
 Imports: 
+    bslib,
     config (>= 0.3.1),
+    fullPage,
     golem (>= 0.3.2),
     shiny (>= 1.7.1)
 Suggests: 
