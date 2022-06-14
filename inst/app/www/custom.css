@@ -1,29 +1,132 @@
-
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@700&display=swap');
 
 .glass-container {
   background: rgba(230, 226, 221, 0.1);
   border-radius: 30px;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(30px);
-  -webkit-backdrop-filter: blur(30px);
   border-top: 1px solid rgba(230, 226, 221, 0.5);
   border-left: 1px solid rgba(230, 226, 221, 0.5);
   border-right: 1px solid rgba(230, 226, 221, 0.25);
   border-bottom: 1px solid rgba(230, 226, 221, 0.25);
   position: relative;
-  height: 1024px;
+  min-height: 1024px;
   width: 100%;
+  z-index: 2;
+}
+.glass-container::before {
+  content: '';
+  border-radius: 30px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  position: absolute;
+  min-height: 100%;
+  width: 100%;
+  z-index: -1;
+}
+
+.sphere-1 {
+  position: absolute;
+  border-radius: 100%;
+  height: 20rem;
+  width: 20rem;
+  margin: 0;
+  background: radial-gradient(circle at 30% 30%, #75BC56, #000);
+  top: 50%;
+  left: 40%;
+  z-index: 0;
+}
+
+.sphere-2 {
+  position: absolute;
+  border-radius: 100%;
+  height: 12rem;
+  width: 12rem;
+  margin: 0;
+  background: radial-gradient(circle at 30% 30%, #75BC56, #000);
+  top: 10%;
+  left: -8%;
+  z-index: 4;
+}
+
+.sphere-3 {
+  position: absolute;
+  border-radius: 100%;
+  height: 8rem;
+  width: 8rem;
+  margin: 0;
+  background: radial-gradient(circle at 30% 30%, #75BC56, #000);
+  top: 16%;
+  left: 46%;
   z-index: 1;
 }
 
-body::before {
+.navbar-brand {
+  font-family: 'Roboto Slab', serif;
+  font-size: 2rem;
+  padding-left: 3rem;
+  cursor: pointer;
+}
+
+.glass-card {
+  background: rgba(230, 226, 221, 0.1);
+  border-radius: 30px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  border-top: 1px solid rgba(230, 226, 221, 0.5);
+  border-left: 1px solid rgba(230, 226, 221, 0.5);
+  border-right: 1px solid rgba(230, 226, 221, 0.25);
+  border-bottom: 1px solid rgba(230, 226, 221, 0.25);
+  position: relative;
+  min-height: 450px;
+  width: 100%;
+  z-index: 3;
+}
+
+.glass-card::before {
   content: '';
+  border-radius: 30px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  position: absolute;
+  min-height: 100%;
+  width: 100%;
+  z-index: -1;
+}
+
+.h1-color {
+  color: #75bc56;
+}
+
+.btn-gradient {
+  background: linear-gradient(340deg, #262222, #75BC56);
+  color: #e6e2dd !important;
+  border: 1px solid #262222;
+}
+
+.unique-bg {
+  background-image: repeating-linear-gradient(135deg, rgba(230,226,221, 0.09019607843137255) 0px, rgba(230,226,221, 0.09019607843137255) 1px,transparent 1px, transparent 11px),repeating-linear-gradient(45deg, rgba(230,226,221, 0.09019607843137255) 0px, rgba(230,226,221, 0.09019607843137255) 1px,transparent 1px, transparent 11px),linear-gradient(90deg, rgb(38,34,34),rgb(38,34,34));
+}
+
+
+.sphere-4 {
   position: absolute;
   border-radius: 100%;
-  height: 150px;
-  width: 150px;
+  height: 10rem;
+  width: 10rem;
   margin: 0;
   background: radial-gradient(circle at 30% 30%, #75BC56, #000);
-  top: 84%;
-  left: 32%;
+  top: 80%;
+  left: 70%;
+  z-index: 0;
+}
+
+.sphere-5 {
+  position: absolute;
+  border-radius: 100%;
+  height: 25rem;
+  width: 25rem;
+  margin: 0;
+  background: radial-gradient(circle at 30% 30%, #75BC56, #000);
+  top: -15%;
+  left: 93%;
+  z-index: 0;
 }

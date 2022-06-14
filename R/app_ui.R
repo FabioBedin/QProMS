@@ -27,17 +27,22 @@ app_ui <- function(request) {
     shiny::bootstrapPage(
       theme = bslib::bs_theme(
         version = 5,
-        primary = "#75BC56",
-        secondary = "#e6e2dd"
-        # bg = "#262222"
+        base_font = bslib::font_google("Roboto"),
+        primary = "#75BC56", #verde
+        fg = "#e6e2dd", #grigio chiaro
+        bg = "#262222" # grigio scuro
       ),
 
       fullPage::fullPage(
         opts = options,
         menu = NULL,
         fullPage::fullSection(
-          class = "pt-0",
+          class = "pt-0 unique-bg",
           mod_home_page_ui("home_page_1")
+        ),
+        fullPage::fullSection(
+          class = "pt-0 unique-bg",
+          mod_experimental_design_ui("experimental_design_1")
         )
       )
 
