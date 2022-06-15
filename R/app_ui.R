@@ -9,12 +9,14 @@ app_ui <- function(request) {
   options <- list(
     sectionsColor = c('#262222', '#262222'),
     scrollingSpeed = 1000,
+    showActiveTooltip = TRUE,
     loopBottom = FALSE,
     loopTop = FALSE,
     loopHorizontal = FALSE,
     scrollHorizontally = FALSE,
     resetSliders = FALSE,
-    navigationPosition = "none",
+    navigation = TRUE,
+    navigationPosition = "left",
     responsiveSlides = TRUE,
     controlArrows = FALSE
   )
@@ -37,10 +39,12 @@ app_ui <- function(request) {
         opts = options,
         menu = NULL,
         fullPage::fullSection(
+          menu = "home",
           class = "pt-0 unique-bg",
           mod_home_page_ui("home_page_1")
         ),
         fullPage::fullSection(
+          menu = "expdesig",
           class = "pt-0 unique-bg",
           mod_experimental_design_ui("experimental_design_1")
         )
