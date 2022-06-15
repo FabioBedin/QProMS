@@ -12,13 +12,13 @@ mod_home_page_ui <- function(id){
   tagList(
     tags$div(
       class="container",
-      sphere(size = 20, top = 50, left = 40, z_index = 0),
+      # sphere(size = 20, top = 50, left = 40, z_index = 0),
       sphere(size = 10, top = 80, left = 70, z_index = 0),
       sphere(size = 25, top = -15, left = 93, z_index = 0),
       tags$div(
         class="glass-container",
         sphere(size = 12, top = 10, left = -8, z_index = 4),
-        sphere(size = 8, top = 16, left = 46, z_index = 1),
+        sphere(size = 8, top = 16, left = 50, z_index = 1),
         tags$nav(
           class="container pt-5 px-5",
           tags$header(
@@ -39,11 +39,11 @@ mod_home_page_ui <- function(id){
           tags$div(
             class="row p-4",
             tags$div(
-              class="col-6",
+              class="col-7",
               glass_card(
                 height = "auto",
                 HTML(
-                  '<h1 class="px-5 mt-5 pt-4 display-5" style="color: #e6e2dd;"><span class="h1-color">Q</span>uantitative <span class="h1-color">Pro</span>teomics <span class="h1-color">M</span>ade <span class="h1-color">S</span>imple</h1>'
+                  '<h1 class="px-5 mt-5 pt-4 display-4" style="color: #e6e2dd;"><span class="h1-color">Q</span>uantitative <span class="h1-color">Pro</span>teomics <span class="h1-color">M</span>ade <span class="h1-color">S</span>imple</h1>'
                 ),
                 tags$p(
                   class = "pt-2 px-5 lead",
@@ -61,7 +61,7 @@ mod_home_page_ui <- function(id){
               )
             ),
             tags$div(
-              class="col-6",
+              class="col-5",
               tags$div(
                 style = "min-height: 60vh;"
               )

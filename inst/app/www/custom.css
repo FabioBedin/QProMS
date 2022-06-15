@@ -2,9 +2,9 @@
 
 
 :root {
-  --mainapp: #75BC56;
-  --textapp: #e6e2dd;
-  --bgapp: #262222;
+  --main-app: #75BC56;
+  --text-app: #e6e2dd;
+  --bg-app: #262222;
 }
 
 .glass-container {
@@ -22,8 +22,8 @@
 .glass-container::before {
   content: '';
   border-radius: 30px;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
   position: absolute;
   min-height: 100%;
   width: 100%;
@@ -34,7 +34,7 @@
   position: absolute;
   border-radius: 100%;
   margin: 0;
-  background: radial-gradient(circle at 30% 30%, var(--mainapp), var(--bgapp));
+  background: radial-gradient(circle at 30% 30%, var(--main-app), var(--bg-app));
 }
 
 .navbar-brand {
@@ -69,13 +69,13 @@
 }
 
 .h1-color {
-  color: var(--mainapp);
+  color: var(--main-app);
 }
 
 .btn-gradient {
-  background: linear-gradient(340deg, var(--bgapp), var(--mainapp));
-  color: var(--textapp) !important;
-  border: 1px solid var(--bgapp);
+  background: linear-gradient(340deg, var(--bg-app), var(--main-app));
+  color: var(--text-app) !important;
+  border: 1px solid var(--bg-app);
 }
 
 .unique-bg {
@@ -83,7 +83,7 @@
 }
 
 #fp-nav > ul > li > a > span {
-  background: var(--textapp) !important;
+  background: var(--text-app) !important;
 }
 
 .home-icon {
@@ -95,5 +95,19 @@
   border-left: 1px solid rgba(230, 226, 221, 0.5);
   border-right: 1px solid rgba(230, 226, 221, 0.25);
   border-bottom: 1px solid rgba(230, 226, 221, 0.25);
-  color: var(--textapp);
+  color: var(--text-app);
 }
+
+.home-icon:hover {
+  background: rgba(230, 226, 221, 1);
+  color: var(--bg-app);
+}
+
+
+
+
+
+
+
+
+
