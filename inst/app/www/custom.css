@@ -73,9 +73,19 @@
 }
 
 .btn-gradient {
+  padding-left: 2rem;
+  padding-right: 2rem;
+  font-size: 1.4rem;
   background: linear-gradient(340deg, var(--bg-app), var(--main-app));
+  border-radius: 30px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(230, 226, 221, 0.5);
   color: var(--text-app) !important;
-  border: 1px solid var(--bg-app);
+}
+
+.btn-gradient:hover {
+  background: var(--text-app);
+  color: var(--bg-app) !important;
 }
 
 .unique-bg {
@@ -99,14 +109,28 @@
 }
 
 .home-icon:hover {
-  background: rgba(230, 226, 221, 1);
-  color: var(--bg-app);
+  background: linear-gradient(340deg, var(--bg-app), var(--main-app));
+  color: var(--text-app);
 }
 
+.render-plot-btn {
+  padding-left: 2rem;
+  padding-right: 2rem;
+  font-size: 1.4rem;
+  background: rgba(230, 226, 221, 0.1);
+  border-radius: 30px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  border-top: 1px solid rgba(230, 226, 221, 0.5);
+  border-left: 1px solid rgba(230, 226, 221, 0.5);
+  border-right: 1px solid rgba(230, 226, 221, 0.25);
+  border-bottom: 1px solid rgba(230, 226, 221, 0.25);
+  color: var(--text-app);
+}
 
-
-
-
+.render-plot-btn:hover {
+  background: linear-gradient(340deg, var(--bg-app), var(--main-app));
+  color: var(--text-app);
+}
 
 
 

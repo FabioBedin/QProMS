@@ -10,7 +10,8 @@ Imports:
     config (>= 0.3.1),
     fullPage,
     golem (>= 0.3.2),
-    shiny (>= 1.7.1)
+    shiny (>= 1.7.1),
+    shinyWidgets
 Suggests: 
     spelling,
     testthat (>= 3.0.0)

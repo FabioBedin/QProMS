@@ -47,6 +47,21 @@ app_ui <- function(request) {
           menu = "expdesig",
           class = "pt-0 unique-bg",
           mod_experimental_design_ui("experimental_design_1")
+        ),
+        fullPage::fullSection(
+          menu = "preprocessing",
+          class = "pt-0 unique-bg",
+          mod_data_preprocessing_ui("data_preprocessing_1")
+        ),
+        fullPage::fullSection(
+          menu = "normalization",
+          class = "pt-0 unique-bg",
+          mod_normalization_ui("normalization_1")
+        ),
+        fullPage::fullSection(
+          menu = "imputation",
+          class = "pt-0 unique-bg",
+          mod_imputation_ui("imputation_1")
         )
       )
 

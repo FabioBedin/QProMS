@@ -18,13 +18,16 @@ mod_experimental_design_ui <- function(id){
         sphere(size = 13, top = 19, left = 78, z_index = 1),
         sphere(size = 8, top = 95, left = 30, z_index = 4),
         tags$div(
-          class="row",
+          class="row px-4",
           tags$div(
-            class="col-11",
+            class="col-3 text-start align-self-end",
+          ),
+          tags$div(
+            class="col-6 text-center",
             tags$h2(class="ps-4", "Experimental design")
           ),
           tags$div(
-            class="col-1 align-self-end",
+            class="col-3 text-end align-self-end",
             fullPage::fullButtonTo(
               icon("home", class = "home-icon fa-2x", lib = "font-awesome"),
               section = 1,
@@ -45,7 +48,7 @@ mod_experimental_design_ui <- function(id){
             glass_card(height = "150px")
           )
         ),
-        tags$h2(class="ps-4", "ProteinGroups"),
+        tags$h2(class="text-center", "ProteinGroups"),
         tags$div(
           class="row p-4",
           tags$div(
