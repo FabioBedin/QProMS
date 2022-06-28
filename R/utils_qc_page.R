@@ -27,12 +27,18 @@ data_wrangling_page <- function(bg_sphere, title){
           ),
           tags$div(
             class="col-6 text-center",
-            tags$h2(class="ps-4", title)
+            tags$h2(class="", title)
           ),
           tags$div(
-            class="col-3 text-end align-self-end",
+            class="col-3 text-end align-self-end d-flex justify-content-end",
+            shiny::actionButton(
+              inputId = "guide",
+              label = NULL,
+              icon = icon("info", class = "fa-2x", lib = "font-awesome"),
+              class = "guide-icon"
+            ),
             fullPage::fullButtonTo(
-              icon("home", class = "home-icon fa-2x", lib = "font-awesome"),
+              icon("home", class = "home-icon fa-2x ms-3", lib = "font-awesome"),
               section = 1,
               slide = 0,
               outline = FALSE,
@@ -43,15 +49,15 @@ data_wrangling_page <- function(bg_sphere, title){
         tags$div(
           class="row px-4 pt-4 justify-content-around",
           tags$div(
-            class="col-3",
+            class="col-4",
             glass_card(height = "150px")
           ),
           tags$div(
-            class="col-3",
+            class="col-4",
             glass_card(height = "150px")
           ),
           tags$div(
-            class="col-3",
+            class="col-4",
             glass_card(height = "150px")
           )
         ),

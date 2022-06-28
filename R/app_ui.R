@@ -44,6 +44,11 @@ app_ui <- function(request) {
           mod_home_page_ui("home_page_1")
         ),
         fullPage::fullSection(
+          menu = "uploading",
+          class = "pt-0 unique-bg",
+          mod_uploading_data_ui("uploading_data_1")
+        ),
+        fullPage::fullSection(
           menu = "expdesig",
           class = "pt-0 unique-bg",
           mod_experimental_design_ui("experimental_design_1")

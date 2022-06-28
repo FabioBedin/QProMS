@@ -10,6 +10,7 @@ Imports:
     config (>= 0.3.1),
     fullPage,
     golem (>= 0.3.2),
+    R6,
     shiny (>= 1.7.1),
     shinyWidgets
 Suggests: 

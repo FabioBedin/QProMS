@@ -21,15 +21,26 @@ mod_experimental_design_ui <- function(id){
           class="row px-4",
           tags$div(
             class="col-3 text-start align-self-end",
+            shiny::actionButton(
+              inputId = "save_expdesign",
+              label = "save",
+              class = "render-plot-btn"
+            )
           ),
           tags$div(
             class="col-6 text-center",
             tags$h2(class="ps-4", "Experimental design")
           ),
           tags$div(
-            class="col-3 text-end align-self-end",
+            class="col-3 text-end align-self-end d-flex justify-content-end",
+            shiny::actionButton(
+              inputId = "guide",
+              label = NULL,
+              icon = icon("info", class = "fa-2x", lib = "font-awesome"),
+              class = "guide-icon"
+            ),
             fullPage::fullButtonTo(
-              icon("home", class = "home-icon fa-2x", lib = "font-awesome"),
+              icon("home", class = "home-icon fa-2x  ms-3", lib = "font-awesome"),
               section = 1,
               slide = 0,
               outline = FALSE,
@@ -38,24 +49,24 @@ mod_experimental_design_ui <- function(id){
           )
         ),
         tags$div(
-          class="row px-4 pt-4",
-          tags$div(
-            class="col-9",
-            glass_card(height = "35vh")
-          ),
-          tags$div(
-            class="col-3 align-self-center",
-            glass_card(height = "150px")
-          )
-        ),
-        tags$h2(class="text-center", "ProteinGroups"),
-        tags$div(
           class="row p-4",
           tags$div(
             class="col-12",
-            glass_card(height = "35vh")
+            glass_card(height = "55vh")
           )
+          # tags$div(
+          #   class="col-3 align-self-center",
+          #   glass_card(height = "150px")
+          # )
         )
+        # tags$h2(class="text-center", "ProteinGroups"),
+        # tags$div(
+        #   class="row p-4",
+        #   tags$div(
+        #     class="col-12",
+        #     glass_card(height = "35vh")
+        #   )
+        # )
       )
     )
 

@@ -1,0 +1,120 @@
+#' uploading_data UI Function
+#'
+#' @description A shiny Module.
+#'
+#' @param id,input,output,session Internal parameters for {shiny}.
+#'
+#' @noRd
+#'
+#' @importFrom shiny NS tagList
+mod_uploading_data_ui <- function(id){
+  ns <- NS(id)
+  tagList(
+
+    tags$div(
+      class="container",
+      ##spheres
+      sphere(size = 5, top = 70, left = 30, z_index = 0),
+      tags$div(
+        class="glass-container",
+        ##spheres
+        sphere(size = 13, top = 10, left = 75, z_index = 1),
+        tags$div(
+          class="row px-4",
+          tags$div(
+            class="col-3 text-start align-self-end",
+            shiny::actionButton(
+              inputId = ns("preview_upload_data"),
+              label = "Preview",
+              class = "render-plot-btn"
+            )
+          ),
+          tags$div(
+            class="col-6 text-center",
+            tags$h2(class="", "Uploading data")
+          ),
+          tags$div(
+            class="col-3 text-end align-self-end d-flex justify-content-end",
+            shiny::actionButton(
+              inputId = "guide",
+              label = NULL,
+              icon = icon("info", class = "fa-2x", lib = "font-awesome"),
+              class = "guide-icon"
+            ),
+            fullPage::fullButtonTo(
+              icon("home", class = "home-icon fa-2x ms-3", lib = "font-awesome"),
+              section = 1,
+              slide = 0,
+              outline = FALSE,
+              clear = FALSE
+            )
+          )
+        ),
+        tags$div(
+          class="row px-4 pt-4 justify-content-around",
+          tags$div(
+            class="col-4",
+            glass_card(
+              height = "150px",
+              fileInput(ns("load_from_file"), "", accept = ".txt", placeholder = "proteinGroups.txt")
+            )
+          ),
+          tags$div(
+            class="col-4",
+            glass_card(
+              height = "150px",
+              shiny::radioButtons(
+                inputId = ns("radio_input"),
+                label = NULL,
+                inline = TRUE,
+                choices = c("LFQ", "iBAQ", "Intenisty", "TMT"),
+                selected = "LFQ"
+              )
+            )
+          ),
+          tags$div(
+            class="col-4",
+            glass_card(
+              height = "150px",
+              shiny::radioButtons(
+                inputId = ns("radio_input2"),
+                label = NULL,
+                inline = TRUE,
+                choices = c("MaxQuant", "Other"),
+                selected = "MaxQuant"
+              )
+            )
+          )
+        ),
+        tags$div(
+          class="row p-4",
+          tags$div(
+            class="col-12",
+            glass_card(height = "40vh")
+          )
+        )
+      )
+    )
+
+  )
+}
+
+#' uploading_data Server Functions
+#'
+#' @noRd
+mod_uploading_data_server <- function(id, r6){
+  moduleServer( id, function(input, output, session){
+    ns <- session$ns
+
+    observeEvent(input$preview_upload_data, {
+      qproms_object$loading_data(data = input$load_from_file, input_type = input$radio_input2, intensity_type = input$radio_input)
+    })
+
+  })
+}
+
+## To be copied in the UI
+# mod_uploading_data_ui("uploading_data_1")
+
+## To be copied in the server
+# mod_uploading_data_server("uploading_data_1")
