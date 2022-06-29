@@ -11,10 +11,24 @@ QProMS <- R6::R6Class(
     input_type = NULL,
     intensity_type = NULL,
     expdesign = NULL,
-    loading_data = function(data, input_type, intensity_type){
-      self$data <- data %>% tibble::as_tibble(.name_repair = janitor::make_clean_names)
+    loading_data = function(data_input, input_type, intensity_type){
+      self$data <- data.table::fread(input = data_input$datapath) %>%
+        tibble::as_tibble(.name_repair = janitor::make_clean_names)
       self$input_type <- input_type
       self$intensity_type <- intensity_type
+    },
+    make_expdesign = function(){
+      ## qui mettere tutti gli if in base all'intensity type
+      ## per adesso metto solo lfq
+      col_names <- self$data %>%
+        dplyr::select(starts_with("lfq_intensity")) %>%
+        colnames()
+
+      self$expdesign <- data.frame(
+        label = col_names,
+        condition = rep("", each = length(col_names)),
+        replicate = rep("", each = length(col_names))
+      )
     },
     make_unique_names_pg = function(){
       ## this function remove duplicate and missing gene names in proteinGroups.txt input

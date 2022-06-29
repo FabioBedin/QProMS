@@ -8,8 +8,10 @@ License: MIT + file LICENSE
 Imports: 
     bslib,
     config (>= 0.3.1),
+    DT,
     fullPage,
     golem (>= 0.3.2),
+    magrittr,
     R6,
     shiny (>= 1.7.1),
     shinyWidgets

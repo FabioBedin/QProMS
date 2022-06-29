@@ -90,7 +90,7 @@ mod_uploading_data_ui <- function(id){
           class="row p-4",
           tags$div(
             class="col-12",
-            glass_card(height = "40vh")
+            glass_card(height = "40vh", DT::DTOutput(ns("preview_table")))
           )
         )
       )
@@ -107,7 +107,31 @@ mod_uploading_data_server <- function(id, r6){
     ns <- session$ns
 
     observeEvent(input$preview_upload_data, {
-      qproms_object$loading_data(data = input$load_from_file, input_type = input$radio_input2, intensity_type = input$radio_input)
+      req(input$load_from_file)
+      req(input$radio_input2)
+      req(input$radio_input)
+
+      r6$loading_data(data_input = input$load_from_file, input_type = input$radio_input2, intensity_type = input$radio_input)
+
+      if(input$radio_input2 == "MaxQuant"){
+        r6$make_unique_names_pg()
+      }
+
+      r6$make_expdesign()
+
+    })
+
+    output$preview_table = DT::renderDT({
+      req(input$preview_upload_data)
+
+      table <- r6$data
+
+      table %>%
+        dplyr::select(gene_names, starts_with("lfq_intensity")) %>%
+        DT::datatable(options = list(
+          columnDefs = list(list(className = 'dt-center', width = '200px', targets = '_all')),
+          scrollX = 500,
+          pageLength = 10))
     })
 
   })
