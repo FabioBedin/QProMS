@@ -81,20 +81,14 @@ mod_experimental_design_server <- function(id, r6, globalSession){
     ns <- session$ns
 
     output$expdesign_table = DT::renderDataTable({
-      req(input$save_expdesign)
+      # req(input$save_expdesign)
+      gargoyle::watch("make_expdesign")
       r6$expdesign
       }, selection = 'none', rownames = FALSE, editable = 'all', options = list(pageLength = nrow(r6$expdesign)))
 
     proxy = DT::dataTableProxy('expdesign_table', session = globalSession)
 
     observeEvent(input$expdesign_table_cell_edit, {
-      # info = input$expdesign_table_cell_edit
-      # # str(info)
-      # i = info$row
-      # j = info$col
-      # v = info$value
-      # r6$expdesign[i, j] <<- DT::coerceValue(v, r6$expdesign[i, j])
-      # DT::replaceData(proxy, r6$expdesign, resetPaging = FALSE, rownames = FALSE)
 
       r6$expdesign <<- DT::editData(data = r6$expdesign,
                                     info = input$expdesign_table_cell_edit,
@@ -102,8 +96,13 @@ mod_experimental_design_server <- function(id, r6, globalSession){
                                     proxy = proxy)
     })
 
-    observeEvent(input$guide, {
-      print(r6$expdesign)
+    observeEvent(input$save_expdesign, {
+
+      expdes <- r6$expdesign
+
+      # fare prima dei controlli su exp design
+
+      r6$standardize_pg_data(expdes)
     })
 
   })

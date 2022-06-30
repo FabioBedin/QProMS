@@ -28,6 +28,7 @@ mod_uploading_data_ui <- function(id){
               label = "Preview",
               class = "render-plot-btn"
             )
+            # fullButtonDownCustom("Down", id="custom_test")
           ),
           tags$div(
             class="col-6 text-center",
@@ -95,7 +96,6 @@ mod_uploading_data_ui <- function(id){
         )
       )
     )
-
   )
 }
 
@@ -118,6 +118,8 @@ mod_uploading_data_server <- function(id, r6){
       }
 
       r6$make_expdesign()
+
+      gargoyle::trigger("make_expdesign")
 
     })
 
