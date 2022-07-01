@@ -12,7 +12,7 @@ mod_uploading_data_ui <- function(id){
   tagList(
 
     tags$div(
-      class="container",
+      class="container-xxl",
       ##spheres
       sphere(size = 5, top = 70, left = 30, z_index = 0),
       tags$div(

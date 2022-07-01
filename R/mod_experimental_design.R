@@ -11,7 +11,7 @@ mod_experimental_design_ui <- function(id){
   ns <- NS(id)
   tagList(
     tags$div(
-      class="container",
+      class="container-xxl",
       sphere(size = 18, top = 2, left = 20, z_index = 0),
       tags$div(
         class="glass-container",

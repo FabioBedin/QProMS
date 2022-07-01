@@ -11,7 +11,7 @@ mod_data_preprocessing_ui <- function(id){
   ns <- NS(id)
   tagList(
     tags$div(
-      class="container",
+      class="container-xxl",
       ##spheres
       sphere(size = 20, top = 50, left = 40, z_index = 0),
       tags$div(
@@ -81,7 +81,23 @@ mod_data_preprocessing_ui <- function(id){
           ),
           tags$div(
             class="col-4",
-            glass_card(height = "150px")
+            glass_card(
+              height = "150px",
+              shiny::selectInput(
+                inputId = ns("valid_val_type"),
+                label = NULL,
+                choices = c("alog", "each_grp", "total"),
+                selected = "alog"
+              ),
+              shiny::sliderInput(
+                inputId = ns("slider_valid_val_thr"),
+                label = NULL,
+                min = 0.5,
+                max = 1,
+                value = 0.75,
+                step = 0.05
+              )
+            )
           )
         ),
         tags$div(
@@ -92,7 +108,7 @@ mod_data_preprocessing_ui <- function(id){
           ),
           tags$div(
             class="col-6",
-            glass_card(height = "40vh")
+            glass_card(height = "40vh", echarts4r::echarts4rOutput(ns("plot2")))
           )
         )
       )
@@ -108,37 +124,58 @@ mod_data_preprocessing_server <- function(id, r6){
     ns <- session$ns
 
     observeEvent(input$render, {
-      shiny::req(input$rev)
-      shiny::req(input$cont)
-      shiny::req(input$oibs)
-      shiny::req(input$peptides_type)
-      shiny::req(input$slider_peptide_thr)
 
-      r6$pg_wrangling(rev = input$rev,
-                      cont = input$cont,
-                      oibs = input$oibs,
-                      pep_col = input$peptides_type,
-                      pep_thr = input$slider_peptide_thr)
+      if(r6$input_type == "MaxQuant"){
+        r6$pg_wrangling(rev = input$rev,
+                        cont = input$cont,
+                        oibs = input$oibs,
+                        pep_col = input$peptides_type,
+                        pep_thr = input$slider_peptide_thr)
+      }
 
-      gargoyle::trigger("test_plot")
-    })
+      r6$filter_valid_val(type = input$valid_val_type, thr = input$slider_valid_val_thr)
 
-    output$plot1 <-  echarts4r::renderEcharts4r({
-      gargoyle::watch("test_plot")
+      data <- r6$filtered_data
+      expdes <- r6$expdesign
 
-      data <- r6$pg_filtered_data
-
-      data %>%
+      r6$protein_counts_plot <- data %>%
         dplyr::group_by(label) %>%
         dplyr::summarise(counts = sum(bin_intensity)) %>%
         dplyr::ungroup() %>%
-        dplyr::inner_join(., expdesign, by = "label") %>%
+        dplyr::inner_join(., expdes, by = "label") %>%
         dplyr::mutate(replicate = as.factor(replicate)) %>%
         dplyr::group_by(condition) %>%
         echarts4r::e_charts(replicate) %>%
         # echarts4r::e_title(text = "Protein per sample", left = "center") %>%
         echarts4r::e_bar(counts) %>%
         echarts4r::e_tooltip(trigger = "item")
+
+      r6$protein_coverage_plot <- data %>%
+        dplyr::group_by(gene_names) %>%
+        dplyr::summarise(counts = sum(bin_intensity)) %>%
+        dplyr::ungroup() %>%
+        dplyr::select(counts) %>%
+        table() %>%
+        tibble::as_tibble() %>%
+        dplyr::rename(occurrence = n) %>%
+        echarts4r::e_charts(counts) %>%
+        # echarts4r::e_title(text = "Protein coverage", left = "center") %>%
+        echarts4r::e_bar(occurrence) %>%
+        echarts4r::e_tooltip(trigger = "item")
+    })
+
+    output$plot1 <-  echarts4r::renderEcharts4r({
+
+      shiny::req(input$render)
+
+      r6$protein_counts_plot
+    })
+
+    output$plot2 <-  echarts4r::renderEcharts4r({
+
+      shiny::req(input$render)
+
+      r6$protein_coverage_plot
     })
 
   })

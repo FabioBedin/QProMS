@@ -11,6 +11,8 @@ QProMS <- R6::R6Class(
     input_type = NULL,
     intensity_type = NULL,
     expdesign = NULL,
+    protein_counts_plot = NULL,
+    protein_coverage_plot = NULL,
     loading_data = function(data_input, input_type, intensity_type){
       self$data <- data.table::fread(input = data_input$datapath) %>%
         tibble::as_tibble(.name_repair = janitor::make_clean_names)
@@ -89,7 +91,8 @@ QProMS <- R6::R6Class(
         ) %>%
         dplyr::inner_join(., expdesign, by = "label") %>%
         dplyr::mutate(raw_intensity = log2(raw_intensity)) %>%
-        dplyr::mutate(raw_intensity = dplyr::na_if(raw_intensity, -Inf))
+        dplyr::mutate(raw_intensity = dplyr::na_if(raw_intensity, -Inf)) %>%
+        dplyr::mutate(bin_intensity = dplyr::if_else(is.na(raw_intensity), 0, 1))
     },
     pg_wrangling = function(rev = TRUE,
                             cont = TRUE,
@@ -106,20 +109,20 @@ QProMS <- R6::R6Class(
         {if(pep_col == "peptides"){dplyr::filter(., peptides >= pep_thr)}
           else if (pep_col == "unique") {dplyr::filter(., unique_peptides >= pep_thr)}
           else {dplyr::filter(., razor_unique_peptides >= pep_thr)}} %>%
-        dplyr::select(gene_names, label, condition, replicate, raw_intensity)
+        dplyr::select(gene_names, label, condition, replicate, raw_intensity, bin_intensity)
 
       invisible(self)
     },
     filter_valid_val = function(type = "alog", thr){
 
       self$filtered_data <- self$pg_filtered_data %>%
-        dplyr::mutate(bin_intensity = dplyr::if_else(is.na(raw_intensity), 0, 1)) %>%
+        # dplyr::mutate(bin_intensity = dplyr::if_else(is.na(raw_intensity), 0, 1)) %>%
         ## different type of strategy for filter missing data:
         ## c("alog", "each_grp", "total") alog -> at least one group
         {if(type == "total")dplyr::group_by(., gene_names)
           else dplyr::group_by(., gene_names, condition)} %>%
-        dplyr::mutate(miss_val = n() - sum(bin_intensity)) %>%
-        dplyr::mutate(n_size = n()) %>%
+        dplyr::mutate(miss_val = dplyr::n() - sum(bin_intensity)) %>%
+        dplyr::mutate(n_size = dplyr::n()) %>%
         dplyr::ungroup() %>%
         dplyr::group_by(gene_names) %>%
         ## rage compreso tra 50% e 100% espresso in valori tra 0.5 e 1

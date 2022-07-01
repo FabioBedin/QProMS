@@ -9,7 +9,7 @@ app_server <- function(input, output, session) {
   options(shiny.maxRequestSize=10000*1024^2)
   # Your application server logic
 
-  gargoyle::init("make_expdesign", "test_plot")
+  gargoyle::init("make_expdesign", "test_plot") #, "test_plot"
 
   # greate a new QProMS object
   qproms_object <- QProMS$new()

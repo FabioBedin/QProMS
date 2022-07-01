@@ -11,7 +11,7 @@ mod_home_page_ui <- function(id){
   ns <- NS(id)
   tagList(
     tags$div(
-      class="container",
+      class="container-xxl",
       # sphere(size = 20, top = 50, left = 40, z_index = 0),
       sphere(size = 10, top = 80, left = 70, z_index = 0),
       sphere(size = 25, top = -15, left = 93, z_index = 0),

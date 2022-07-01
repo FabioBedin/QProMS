@@ -7,6 +7,10 @@
   --bg-app: #262222;
 }
 
+.container-xxl {
+  max-width: 1400px !important;
+}
+
 .glass-container {
   background: rgba(230, 226, 221, 0.1);
   border-radius: 30px;
