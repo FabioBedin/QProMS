@@ -67,6 +67,7 @@ QProMS <- R6::R6Class(
         dplyr::mutate(gene_names = stringr::str_extract(gene_names, "[^;]*"))
     },
     standardize_pg_data = function(expdesign){
+      ## cambiare il self data
       self$data <- self$data %>%
         dplyr::select(
           gene_names,

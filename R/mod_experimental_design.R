@@ -50,23 +50,15 @@ mod_experimental_design_ui <- function(id){
         ),
         tags$div(
           class="row p-4",
+          # tags$div(
+          #   class="col-12",
+          #   glass_card(height = "55vh", DT::dataTableOutput(ns("expdesign_table")))
+          # )
           tags$div(
             class="col-12",
-            glass_card(height = "55vh", DT::dataTableOutput(ns("expdesign_table")))
+            glass_card(height = "55vh", rhandsontable::rHandsontableOutput(ns("expdesign_table")))
           )
-          # tags$div(
-          #   class="col-3 align-self-center",
-          #   glass_card(height = "150px")
-          # )
         )
-        # tags$h2(class="text-center", "ProteinGroups"),
-        # tags$div(
-        #   class="row p-4",
-        #   tags$div(
-        #     class="col-12",
-        #     glass_card(height = "35vh")
-        #   )
-        # )
       )
     )
 
@@ -80,29 +72,61 @@ mod_experimental_design_server <- function(id, r6, globalSession){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
-    output$expdesign_table = DT::renderDataTable({
-      # req(input$save_expdesign)
-      gargoyle::watch("make_expdesign")
-      r6$expdesign
-      }, selection = 'none', rownames = FALSE, editable = 'all', options = list(pageLength = nrow(r6$expdesign)))
-
-    proxy = DT::dataTableProxy('expdesign_table', session = globalSession)
-
-    observeEvent(input$expdesign_table_cell_edit, {
-
-      r6$expdesign <<- DT::editData(data = r6$expdesign,
-                                    info = input$expdesign_table_cell_edit,
-                                    rownames = FALSE,
-                                    proxy = proxy)
-    })
+    # output$expdesign_table = DT::renderDataTable({
+    #   # req(input$save_expdesign)
+    #   gargoyle::watch("make_expdesign")
+    #   r6$expdesign
+    #   }, selection = 'none', rownames = FALSE, editable = 'all', options = list(pageLength = nrow(r6$expdesign)))
+    #
+    # proxy = DT::dataTableProxy('expdesign_table', session = globalSession)
+    #
+    # observeEvent(input$expdesign_table_cell_edit, {
+    #
+    #   r6$expdesign <<- DT::editData(data = r6$expdesign,
+    #                                 info = input$expdesign_table_cell_edit,
+    #                                 rownames = FALSE,
+    #                                 proxy = proxy)
+    # })
+    #
+    # observeEvent(input$save_expdesign, {
+    #
+    #   expdes <- r6$expdesign
+    #
+    #   # fare prima dei controlli su exp design
+    #
+    #   r6$standardize_pg_data(expdes)
+    # })
 
     observeEvent(input$save_expdesign, {
+
+      req(input$expdesign_table)
+
+      if(!is.null(input$expdesign_table)){
+
+        r6$expdesign <- rhandsontable::hot_to_r(input$expdesign_table)
+
+        expdes <- r6$expdesign
+
+        # fare prima dei controlli su exp design
+
+        r6$standardize_pg_data(expdes)
+
+      }
+    })
+
+    output$expdesign_table <- rhandsontable::renderRHandsontable({
+      gargoyle::watch("make_expdesign")
+
+      rhandsontable::rhandsontable(data = r6$expdesign)
+    })
+
+    observeEvent(input$guide, {
 
       expdes <- r6$expdesign
 
       # fare prima dei controlli su exp design
 
-      r6$standardize_pg_data(expdes)
+      print(expdes)
     })
 
   })
