@@ -10,7 +10,6 @@
 mod_uploading_data_ui <- function(id){
   ns <- NS(id)
   tagList(
-
     tags$div(
       class="container-xxl",
       ##spheres
@@ -22,12 +21,7 @@ mod_uploading_data_ui <- function(id){
         tags$div(
           class="row px-4",
           tags$div(
-            class="col-3 text-start align-self-end",
-            shiny::actionButton(
-              inputId = ns("preview_upload_data"),
-              label = "Preview",
-              class = "render-plot-btn"
-            )
+            class="col-3 text-start align-self-end"
             # fullButtonDownCustom("Down", id="custom_test")
           ),
           tags$div(
@@ -52,46 +46,43 @@ mod_uploading_data_ui <- function(id){
           )
         ),
         tags$div(
-          class="row px-4 pt-4 justify-content-around",
+          class="row p-4",
           tags$div(
-            class="col-4",
+            class="col-3",
             glass_card(
-              height = "150px",
-              fileInput(ns("load_from_file"), "", accept = ".txt", placeholder = "proteinGroups.txt")
-            )
-          ),
-          tags$div(
-            class="col-4",
-            glass_card(
-              height = "150px",
+              height = "550px",
+              tags$h5(class="m-0 px-3 pt-4", "Browse:"),
+              fileInputCustom(ns("load_from_file"), "", accept = ".txt"),
+              tags$h5(class="m-0 p-3", "Intensity type:"),
               shiny::radioButtons(
                 inputId = ns("radio_input"),
                 label = NULL,
                 inline = TRUE,
                 choices = c("LFQ", "iBAQ", "Intenisty", "TMT"),
                 selected = "LFQ"
-              )
-            )
-          ),
-          tags$div(
-            class="col-4",
-            glass_card(
-              height = "150px",
+              ),
+              tags$h5(class="m-0 p-3", "Input type:"),
               shiny::radioButtons(
                 inputId = ns("radio_input2"),
                 label = NULL,
                 inline = TRUE,
                 choices = c("MaxQuant", "Other"),
                 selected = "MaxQuant"
+              ),
+              tags$br(),
+              div(
+                class="d-flex justify-content-center px-3 py-5",
+                shiny::actionButton(
+                  inputId = ns("preview_upload_data"),
+                  label = "Upload",
+                  class = "render-plot-btn"
+                )
               )
             )
-          )
-        ),
-        tags$div(
-          class="row p-4",
+          ),
           tags$div(
-            class="col-12",
-            glass_card(height = "40vh", DT::DTOutput(ns("preview_table")))
+            class="col-9",
+            glass_card(height = "550px", DT::DTOutput(ns("preview_table")))
           )
         )
       )

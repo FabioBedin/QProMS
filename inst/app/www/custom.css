@@ -135,10 +135,11 @@
 }
 
 .render-plot-btn {
+  width: 100%;
   padding-left: 2rem;
   padding-right: 2rem;
-  font-size: 1.4rem;
-  background: rgba(230, 226, 221, 0.1);
+  font-size: 1rem;
+  background: linear-gradient(340deg, var(--bg-app), var(--main-app));
   border-radius: 30px;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   border-top: 1px solid rgba(230, 226, 221, 0.5);
@@ -149,9 +150,61 @@
 }
 
 .render-plot-btn:hover {
-  background: linear-gradient(340deg, var(--bg-app), var(--main-app));
-  color: var(--text-app);
+  background: var(--text-app);
+  color: var(--bg-app);
 }
+
+
+.custom-file-imput-1 {
+  border-radius: 30px 0 0 30px;
+  background: var(--text-app);
+  color: var(--bg-app);
+}
+
+.custom-file-imput-1:hover {
+  background: var(--text-app);
+  color: var(--main-app);
+}
+
+
+input[type="radio"] {
+  display: none;
+}
+
+
+.shiny-options-group {
+  display: flex;
+  overflow: hidden;
+  border-radius: 30px;
+  justify-content: center;
+  margin-right: 1rem;
+  margin-left: 1rem;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  border-top: 1px solid rgba(230, 226, 221, 0.5);
+  border-left: 1px solid rgba(230, 226, 221, 0.5);
+  border-right: 1px solid rgba(230, 226, 221, 0.25);
+  border-bottom: 1px solid rgba(230, 226, 221, 0.25);
+}
+
+.radio-inline {
+  padding: 8px 14px;
+  background: rgba(230, 226, 221, 0.1);
+  margin-right: 0 !important;
+  flex: 1 1 auto !important;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+input:checked + span {
+  padding: 0.25rem 0.5rem;
+  border-radius: 30px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  background: var(--text-app);
+  color: var(--bg-app);
+}
+
+
+
 
 
 

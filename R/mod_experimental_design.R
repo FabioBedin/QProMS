@@ -115,6 +115,7 @@ mod_experimental_design_server <- function(id, r6, globalSession){
     })
 
     output$expdesign_table <- rhandsontable::renderRHandsontable({
+
       gargoyle::watch("make_expdesign")
 
       rhandsontable::rhandsontable(data = r6$expdesign)
