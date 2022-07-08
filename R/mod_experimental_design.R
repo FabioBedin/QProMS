@@ -25,22 +25,27 @@ mod_experimental_design_ui <- function(id){
               inputId = ns("save_expdesign"),
               label = "save",
               class = "render-plot-btn"
+            ),
+            shiny::actionButton(
+              inputId = ns("reset_expdesign"),
+              label = "reset",
+              class = "render-plot-btn-secondary ms-2"
             )
           ),
           tags$div(
             class="col-6 text-center",
-            tags$h2(class="ps-4", "Experimental design")
+            tags$h2(class="pt-4 m-0", "Experimental design")
           ),
           tags$div(
             class="col-3 text-end align-self-end d-flex justify-content-end",
             shiny::actionButton(
               inputId = ns("guide"),
               label = NULL,
-              icon = icon("info", class = "fa-2x", lib = "font-awesome"),
+              icon = icon("info", class = "fa", lib = "font-awesome"),
               class = "guide-icon"
             ),
             fullPage::fullButtonTo(
-              icon("home", class = "home-icon fa-2x  ms-3", lib = "font-awesome"),
+              icon("home", class = "home-icon fa ms-2", lib = "font-awesome"),
               section = 1,
               slide = 0,
               outline = FALSE,
@@ -51,12 +56,18 @@ mod_experimental_design_ui <- function(id){
         tags$div(
           class="row p-4",
           # tags$div(
-          #   class="col-12",
-          #   glass_card(height = "55vh", DT::dataTableOutput(ns("expdesign_table")))
-          # )
+          #   class="col-3",
+          #   glass_card(height = "550px",
+          #              # shiny::actionButton(
+          #              #   inputId = ns("save_expdesign"),
+          #              #   label = "save",
+          #              #   class = "render-plot-btn"
+          #              # )
+          #              )
+          # ),
           tags$div(
             class="col-12",
-            glass_card(height = "55vh", rhandsontable::rHandsontableOutput(ns("expdesign_table")))
+            glass_card(height = "550px", rhandsontable::rHandsontableOutput(ns("expdesign_table")))
           )
         )
       )
@@ -118,16 +129,21 @@ mod_experimental_design_server <- function(id, r6, globalSession){
 
       gargoyle::watch("make_expdesign")
 
-      rhandsontable::rhandsontable(data = r6$expdesign)
+      render_expdes <- r6$expdesign
+
+      if(!is.null(render_expdes)){
+        rhandsontable::rhandsontable(data = render_expdes, width = "100%", height = 500, stretchH = "all")
+      }
+
+
     })
 
-    observeEvent(input$guide, {
+    observeEvent(input$reset_expdesign, {
 
-      expdes <- r6$expdesign
+      r6$make_expdesign()
 
-      # fare prima dei controlli su exp design
+      gargoyle::trigger("make_expdesign")
 
-      print(expdes)
     })
 
   })

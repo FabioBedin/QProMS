@@ -118,7 +118,7 @@
 }
 
 .guide-icon {
-  padding: 0.5rem 1.3rem 0.5rem 1.3rem;
+  padding: 0.3rem 1rem 0.3rem 1rem;
   background: rgba(230, 226, 221, 0.1);
   border-radius: 50%;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
@@ -135,7 +135,6 @@
 }
 
 .render-plot-btn {
-  width: 100%;
   padding-left: 2rem;
   padding-right: 2rem;
   font-size: 1rem;
@@ -154,6 +153,24 @@
   color: var(--bg-app);
 }
 
+.render-plot-btn-secondary {
+  padding-left: 2rem;
+  padding-right: 2rem;
+  font-size: 1rem;
+  background: rgba(230, 226, 221, 0.1);
+  border-radius: 30px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  border-top: 1px solid rgba(230, 226, 221, 0.5);
+  border-left: 1px solid rgba(230, 226, 221, 0.5);
+  border-right: 1px solid rgba(230, 226, 221, 0.25);
+  border-bottom: 1px solid rgba(230, 226, 221, 0.25);
+  color: var(--text-app);
+}
+
+.render-plot-btn-secondary:hover {
+  background: var(--text-app);
+  color: var(--bg-app);
+}
 
 .custom-file-imput-1 {
   border-radius: 30px 0 0 30px;
@@ -195,7 +212,7 @@ input[type="radio"] {
   transition: background 0.1s;
 }
 
-input:checked + span {
+.radio-inline > input:checked + span {
   padding: 0.25rem 0.5rem;
   border-radius: 30px;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
@@ -203,9 +220,38 @@ input:checked + span {
   color: var(--bg-app);
 }
 
+.radio-inline > span:hover {
+  color: var(--main-app);
+}
 
 
+.selectize-input {
+    background: rgba(230, 226, 221, 0.1) !important;
+    color: var(--text-app);
+    border-radius: 20px;
+}
 
+.selectize-control.single .selectize-input:after {
+  border-color: var(--text-app) transparent transparent transparent;
+}
 
+.selectize-dropdown, .selectize-dropdown.form-control {
+  background: rgba(230, 226, 221, 0.9) !important;
+  border-radius: 20px;
+}
 
+.selectize-input.focus {
+  border-color: var(--main-app) !important;
+  outline: 0;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px var(--main-app);
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px var(--main-app);
+}
+.selectize-input.dropdown-active {
+  border-radius: 20px;
+}
 
+.selectize-dropdown .active {
+  border-radius: 20px;
+    background-color: var(--main-app);
+    color: var(--bg-app);
+}

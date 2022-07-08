@@ -26,18 +26,18 @@ mod_uploading_data_ui <- function(id){
           ),
           tags$div(
             class="col-6 text-center",
-            tags$h2(class="", "Uploading data")
+            tags$h2(class="pt-4 m-0", "Uploading data")
           ),
           tags$div(
             class="col-3 text-end align-self-end d-flex justify-content-end",
             shiny::actionButton(
               inputId = "guide",
               label = NULL,
-              icon = icon("info", class = "fa-2x", lib = "font-awesome"),
+              icon = icon("info", class = "fa", lib = "font-awesome"),
               class = "guide-icon"
             ),
             fullPage::fullButtonTo(
-              icon("home", class = "home-icon fa-2x ms-3", lib = "font-awesome"),
+              icon("home", class = "home-icon fa ms-2", lib = "font-awesome"),
               section = 1,
               slide = 0,
               outline = FALSE,
@@ -51,9 +51,7 @@ mod_uploading_data_ui <- function(id){
             class="col-3",
             glass_card(
               height = "550px",
-              tags$h5(class="m-0 px-3 pt-4", "Browse:"),
-              fileInputCustom(ns("load_from_file"), "", accept = ".txt"),
-              tags$h5(class="m-0 p-3", "Intensity type:"),
+              tags$h5(class="m-0 p-3 pb-4 pt-5 text-primary", "Intensity type"),
               shiny::radioButtons(
                 inputId = ns("radio_input"),
                 label = NULL,
@@ -61,7 +59,7 @@ mod_uploading_data_ui <- function(id){
                 choices = c("LFQ", "iBAQ", "Intenisty", "TMT"),
                 selected = "LFQ"
               ),
-              tags$h5(class="m-0 p-3", "Input type:"),
+              tags$h5(class="m-0 p-3 pb-4 text-primary", "Input type"),
               shiny::radioButtons(
                 inputId = ns("radio_input2"),
                 label = NULL,
@@ -69,13 +67,15 @@ mod_uploading_data_ui <- function(id){
                 choices = c("MaxQuant", "Other"),
                 selected = "MaxQuant"
               ),
+              tags$h5(class="m-0 px-3 pt-3 text-primary", "Browse"),
+              fileInputCustom(ns("load_from_file"), "", accept = ".txt"),
               tags$br(),
               div(
-                class="d-flex justify-content-center px-3 py-5",
+                class="d-flex justify-content-center px-5 pt-5",
                 shiny::actionButton(
                   inputId = ns("preview_upload_data"),
                   label = "Upload",
-                  class = "render-plot-btn"
+                  class = "render-plot-btn w-100"
                 )
               )
             )

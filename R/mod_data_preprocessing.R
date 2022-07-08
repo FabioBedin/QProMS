@@ -30,18 +30,18 @@ mod_data_preprocessing_ui <- function(id){
           ),
           tags$div(
             class="col-6 text-center",
-            tags$h2(class="", "Data wrangling")
+            tags$h2(class="pt-4 m-0", "Data wrangling")
           ),
           tags$div(
             class="col-3 text-end align-self-end d-flex justify-content-end",
             shiny::actionButton(
               inputId = "guide",
               label = NULL,
-              icon = icon("info", class = "fa-2x", lib = "font-awesome"),
+              icon = icon("info", class = "fa", lib = "font-awesome"),
               class = "guide-icon"
             ),
             fullPage::fullButtonTo(
-              icon("home", class = "home-icon fa-2x ms-3", lib = "font-awesome"),
+              icon("home", class = "home-icon fa ms-2", lib = "font-awesome"),
               section = 1,
               slide = 0,
               outline = FALSE,
