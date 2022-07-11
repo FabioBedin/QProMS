@@ -82,7 +82,13 @@ mod_uploading_data_ui <- function(id){
           ),
           tags$div(
             class="col-9",
-            glass_card(height = "550px", DT::DTOutput(ns("preview_table")))
+            glass_card(
+              height = "550px",
+              tags$div(
+                class="p-4",
+                DT::DTOutput(ns("preview_table"))
+              )
+            )
           )
         )
       )
@@ -124,7 +130,9 @@ mod_uploading_data_server <- function(id, r6){
         DT::datatable(options = list(
           columnDefs = list(list(className = 'dt-center', width = '200px', targets = '_all')),
           scrollX = 500,
-          pageLength = 10))
+          pageLength = 8,
+          lengthChange = FALSE),
+          style = "bootstrap5")
     })
 
   })

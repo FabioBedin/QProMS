@@ -252,6 +252,27 @@ input[type="radio"] {
 
 .selectize-dropdown .active {
   border-radius: 20px;
-    background-color: var(--main-app);
-    color: var(--bg-app);
+  background-color: var(--main-app);
+  color: var(--bg-app);
+}
+
+.nav-tabs > li.active > a {
+  background-color: transparent;
+  color: var(--main-app);
+  border: 2px solid;
+  border-color: transparent transparent var(--main-app) transparent;
+}
+
+.nav-tabs > li > a {
+  color: var(--text-app);
+  border: 0;
+  transition: none;
+}
+
+.nav-tabs {
+  border-bottom: 1px solid rgba(230, 226, 221, 0.5);
+}
+
+.handsontable {
+  color: var(--bg-app) !important;
 }

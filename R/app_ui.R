@@ -35,6 +35,8 @@ app_ui <- function(request) {
         bg = "#262222" # grigio scuro
       ),
 
+      shinyWidgets::chooseSliderSkin(skin = "Flat", color = "#75BC56"),
+
       fullPage::fullPage(
         opts = options,
         menu = NULL,

@@ -21,12 +21,12 @@ mod_data_preprocessing_ui <- function(id){
         tags$div(
           class="row px-4",
           tags$div(
-            class="col-3 text-start align-self-end",
-            shiny::actionButton(
-              inputId = ns("render"),
-              label = "Render Plots",
-              class = "render-plot-btn"
-            )
+            class="col-3 text-start align-self-end"
+            # shiny::actionButton(
+            #   inputId = ns("render"),
+            #   label = "Render Plots",
+            #   class = "render-plot-btn"
+            # )
           ),
           tags$div(
             class="col-6 text-center",
@@ -49,66 +49,136 @@ mod_data_preprocessing_ui <- function(id){
             )
           )
         ),
-        tags$div(
-          class="row px-4 pt-4 justify-content-around",
-          tags$div(
-            class="col-4",
-            glass_card(
-              height = "150px",
-              shiny::checkboxInput(inputId = ns("rev"), label = "Reverse", value = TRUE),
-              shiny::checkboxInput(inputId = ns("cont"), label = "Contaminant", value = TRUE),
-              shiny::checkboxInput(inputId = ns("oibs"), label = "Identify by site", value = TRUE)
-            )
-          ),
-          tags$div(
-            class="col-4",
-            glass_card(
-              height = "150px",
-              shiny::selectInput(
-                inputId = ns("peptides_type"),
-                label = NULL,
-                choices = c("peptides", "unique", "razor"),
-                selected = "peptides"
-              ),
-              shiny::sliderInput(
-                inputId = ns("slider_peptide_thr"),
-                label = NULL,
-                min = 0,
-                max = 10,
-                value = 2
-              )
-            )
-          ),
-          tags$div(
-            class="col-4",
-            glass_card(
-              height = "150px",
-              shiny::selectInput(
-                inputId = ns("valid_val_type"),
-                label = NULL,
-                choices = c("alog", "each_grp", "total"),
-                selected = "alog"
-              ),
-              shiny::sliderInput(
-                inputId = ns("slider_valid_val_thr"),
-                label = NULL,
-                min = 0.5,
-                max = 1,
-                value = 0.75,
-                step = 0.05
-              )
-            )
-          )
-        ),
+        # tags$div(
+        #   class="row px-4 pt-4 justify-content-around",
+        #   tags$div(
+        #     class="col-4",
+        #     glass_card(
+        #       height = "150px",
+        #       shinyWidgets::prettyCheckbox(inputId = ns("rev"), label = "Reverse", value = TRUE),
+        #       shinyWidgets::prettyCheckbox(inputId = ns("cont"), label = "Contaminant", value = TRUE),
+        #       shinyWidgets::prettyCheckbox(inputId = ns("oibs"), label = "Identify by site", value = TRUE)
+        #     )
+        #   ),
+        #   tags$div(
+        #     class="col-4",
+        #     glass_card(
+        #       height = "150px",
+        #       shiny::selectInput(
+        #         inputId = ns("peptides_type"),
+        #         label = NULL,
+        #         choices = c("peptides", "unique", "razor"),
+        #         selected = "peptides"
+        #       ),
+        #       shiny::sliderInput(
+        #         inputId = ns("slider_peptide_thr"),
+        #         label = NULL,
+        #         min = 0,
+        #         max = 10,
+        #         value = 2
+        #       )
+        #     )
+        #   ),
+        #   # tags$div(
+        #   #   class="col-4",
+        #   #   glass_card(
+        #   #     height = "150px",
+        #   #     shiny::selectInput(
+        #   #       inputId = ns("valid_val_type"),
+        #   #       label = NULL,
+        #   #       choices = c("alog", "each_grp", "total"),
+        #   #       selected = "alog"
+        #   #     ),
+        #   #     shiny::sliderInput(
+        #   #       inputId = ns("slider_valid_val_thr"),
+        #   #       label = NULL,
+        #   #       min = 0,
+        #   #       max = 1,
+        #   #       value = 0.75,
+        #   #       step = 0.05
+        #   #     )
+        #   #   )
+        #   # )
+        # ),
         tags$div(
           class="row p-4",
           tags$div(
-            class="col-6",
-            glass_card(height = "40vh", echarts4r::echarts4rOutput(ns("plot1")))
+            class="col-3",
+            glass_card(
+              height = "550px",
+              tags$h5(class="m-0 py-3 px-4 text-primary", "Valid values"),
+              tags$div(
+                class="px-4",
+                shiny::sliderInput(
+                  inputId = ns("slider_valid_val_thr"),
+                  label = NULL,
+                  min = 0,
+                  max = 1,
+                  value = 0.75,
+                  step = 0.05
+                ),
+                shiny::selectInput(
+                  inputId = ns("valid_val_type"),
+                  label = NULL,
+                  choices = c("alog", "each_grp", "total"),
+                  selected = "alog"
+                )
+              ),
+              tags$h5(class="m-0 px-4 pt-1 pb-3 text-primary", "Peptides filter"),
+              tags$div(
+                class="px-4",
+                shiny::sliderInput(
+                  inputId = ns("slider_peptide_thr"),
+                  label = NULL,
+                  min = 0,
+                  max = 10,
+                  value = 2
+                ),
+                shiny::selectInput(
+                  inputId = ns("peptides_type"),
+                  label = NULL,
+                  choices = c("peptides", "unique", "razor"),
+                  selected = "peptides"
+                )
+              ),
+              tags$h5(class="m-0 px-4 pt-1 pb-3 text-primary", "Categorical filter"),
+              tags$div(
+                class="d-flex flex-row px-4",
+                shinyWidgets::prettyCheckbox(inputId = ns("rev"), label = "Rev", value = TRUE),
+                shinyWidgets::prettyCheckbox(inputId = ns("cont"), label = "Cont", value = TRUE),
+                shinyWidgets::prettyCheckbox(inputId = ns("oibs"), label = "By site", value = TRUE)
+              ),
+              div(
+                class="d-flex justify-content-center px-4 pt-4 pb-1",
+                shiny::actionButton(
+                  inputId = ns("render"),
+                  label = "Render Plots",
+                  class = "render-plot-btn w-100"
+                )
+              )
+            )
           ),
           tags$div(
-            class="col-6",
-            glass_card(height = "40vh", echarts4r::echarts4rOutput(ns("plot2")))
+            class="col-9",
+            glass_card(
+              height = "550px",
+              tabsetPanel(
+                tabPanel(
+                  title = "Protein per samples",
+                    tags$div(
+                      class="p-4",
+                      echarts4r::echarts4rOutput(ns("plot1"), height = "450")
+                    )
+                  ),
+                tabPanel(
+                  title = "Protein coverage",
+                  tags$div(
+                    class="p-4",
+                    echarts4r::echarts4rOutput(ns("plot2"), height = "450")
+                  )
+                )
+              )
+            )
           )
         )
       )
@@ -148,7 +218,8 @@ mod_data_preprocessing_server <- function(id, r6){
         echarts4r::e_charts(replicate) %>%
         # echarts4r::e_title(text = "Protein per sample", left = "center") %>%
         echarts4r::e_bar(counts) %>%
-        echarts4r::e_tooltip(trigger = "item")
+        echarts4r::e_tooltip(trigger = "item") %>%
+        echarts4r::e_theme("green")
 
       r6$protein_coverage_plot <- data %>%
         dplyr::group_by(gene_names) %>%
@@ -161,7 +232,8 @@ mod_data_preprocessing_server <- function(id, r6){
         echarts4r::e_charts(counts) %>%
         # echarts4r::e_title(text = "Protein coverage", left = "center") %>%
         echarts4r::e_bar(occurrence) %>%
-        echarts4r::e_tooltip(trigger = "item")
+        echarts4r::e_tooltip(trigger = "item") %>%
+        echarts4r::e_theme("green")
     })
 
     output$plot1 <-  echarts4r::renderEcharts4r({

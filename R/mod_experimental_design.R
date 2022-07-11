@@ -55,19 +55,15 @@ mod_experimental_design_ui <- function(id){
         ),
         tags$div(
           class="row p-4",
-          # tags$div(
-          #   class="col-3",
-          #   glass_card(height = "550px",
-          #              # shiny::actionButton(
-          #              #   inputId = ns("save_expdesign"),
-          #              #   label = "save",
-          #              #   class = "render-plot-btn"
-          #              # )
-          #              )
-          # ),
           tags$div(
             class="col-12",
-            glass_card(height = "550px", rhandsontable::rHandsontableOutput(ns("expdesign_table")))
+            glass_card(
+              height = "550px",
+              tags$div(
+                class="p-4",
+                rhandsontable::rHandsontableOutput(ns("expdesign_table"))
+              )
+            )
           )
         )
       )
