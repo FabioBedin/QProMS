@@ -36,6 +36,8 @@ app_ui <- function(request) {
       ),
 
       shinyWidgets::chooseSliderSkin(skin = "Flat", color = "#75BC56"),
+      echarts4r::e_theme_register('{"backgroundColor": "#ffffff"}', name = "QProMS_theme"),
+      # echarts4r::e_theme_register('{"title": {"textStyle": {"color": "#e6e2dd"}, "subtextStyle": {"color": "#e6e2dd"}}}', name = "QProMS_theme"),
 
       fullPage::fullPage(
         opts = options,

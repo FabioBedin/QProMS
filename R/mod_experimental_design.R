@@ -128,7 +128,9 @@ mod_experimental_design_server <- function(id, r6, globalSession){
       render_expdes <- r6$expdesign
 
       if(!is.null(render_expdes)){
-        rhandsontable::rhandsontable(data = render_expdes, width = "100%", height = 500, stretchH = "all")
+        rhandsontable::rhandsontable(data = render_expdes, width = "100%", height = 500, stretchH = "all") %>%
+          rhandsontable::hot_cols(colWidths = "25%") %>%
+          rhandsontable::hot_col("key", readOnly = TRUE)
       }
 
 

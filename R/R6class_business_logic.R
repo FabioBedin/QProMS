@@ -3,16 +3,27 @@
 QProMS <- R6::R6Class(
   classname = "QProMS",
   public = list(
+    # Input parameters
     data = NULL,
+    input_type = NULL,
+    intensity_type = NULL,
+    # Parameters for MaxQuant input
+    pg_data = NULL,
     pg_filtered_data = NULL,
+    #
     filtered_data = NULL,
     normalized_data = NULL,
     imputed_data = NULL,
-    input_type = NULL,
-    intensity_type = NULL,
+    mixed_mean_data = NULL,
     expdesign = NULL,
     protein_counts_plot = NULL,
     protein_coverage_plot = NULL,
+    normalization_plot = NULL,
+    imputation_plot = NULL,
+    is_norm = FALSE,
+    is_mixed = TRUE,
+    is_imp = TRUE,
+
     loading_data = function(data_input, input_type, intensity_type){
       self$data <- data.table::fread(input = data_input$datapath) %>%
         tibble::as_tibble(.name_repair = janitor::make_clean_names)
@@ -27,6 +38,7 @@ QProMS <- R6::R6Class(
         colnames()
 
       self$expdesign <- data.frame(
+        key = col_names,
         label = col_names,
         condition = rep("", each = length(col_names)),
         replicate = rep("", each = length(col_names))
@@ -57,7 +69,7 @@ QProMS <- R6::R6Class(
         dplyr::select(unique_gene_names, id)
 
       ## update self$data that now don't have dupe or missing spot
-      self$data <-
+      self$pg_data <-
         dplyr::left_join(self$data, list_unique_gene_names, by = "id") %>%
         dplyr::mutate(
           gene_names = dplyr::case_when(unique_gene_names != "" ~ unique_gene_names,
@@ -68,10 +80,10 @@ QProMS <- R6::R6Class(
     },
     standardize_pg_data = function(expdesign){
       ## cambiare il self data
-      self$data <- self$data %>%
+      self$pg_data <- self$pg_data %>%
         dplyr::select(
           gene_names,
-          dplyr::all_of(expdesign$label),
+          dplyr::all_of(expdesign$key),
           peptides,
           razor_unique_peptides,
           unique_peptides,
@@ -87,13 +99,14 @@ QProMS <- R6::R6Class(
              reverse,
              potential_contaminant,
              only_identified_by_site),
-          names_to = "label",
+          names_to = "key",
           values_to = "raw_intensity"
         ) %>%
-        dplyr::inner_join(., expdesign, by = "label") %>%
+        dplyr::inner_join(., expdesign, by = "key") %>%
         dplyr::mutate(raw_intensity = log2(raw_intensity)) %>%
         dplyr::mutate(raw_intensity = dplyr::na_if(raw_intensity, -Inf)) %>%
-        dplyr::mutate(bin_intensity = dplyr::if_else(is.na(raw_intensity), 0, 1))
+        dplyr::mutate(bin_intensity = dplyr::if_else(is.na(raw_intensity), 0, 1)) %>%
+        dplyr::select(-key)
     },
     pg_wrangling = function(rev = TRUE,
                             cont = TRUE,
@@ -101,7 +114,7 @@ QProMS <- R6::R6Class(
                             pep_col = "peptides", ## c("peptides", "unique", "razor")
                             pep_thr = 2) {
 
-      self$pg_filtered_data <- self$data %>%
+      self$pg_filtered_data <- self$pg_data %>%
         ## remove reverse, potentialcontaminant and oibs from data base on user input
         {if(rev)dplyr::filter(., !reverse == "+") else .} %>%
         {if(cont)dplyr::filter(., !potential_contaminant == "+") else .} %>%
@@ -114,9 +127,9 @@ QProMS <- R6::R6Class(
 
       invisible(self)
     },
-    filter_valid_val = function(type = "alog", thr){
+    filter_valid_val = function(data, type = "alog", thr){
 
-      self$filtered_data <- self$pg_filtered_data %>%
+      self$filtered_data <- data %>%
         # dplyr::mutate(bin_intensity = dplyr::if_else(is.na(raw_intensity), 0, 1)) %>%
         ## different type of strategy for filter missing data:
         ## c("alog", "each_grp", "total") alog -> at least one group
@@ -153,6 +166,89 @@ QProMS <- R6::R6Class(
                             values_to = "norm_intensity") %>%
         dplyr::full_join(self$filtered_data, .x, by = c("gene_names", "label")) %>%
         dplyr::relocate(norm_intensity, .after = last_col())
+    },
+    mean_partial_imputation = function(is_norm){
+
+      ## in this function we define row in each group that have more then 75% of valid values
+      ## and replace their missing data (MAR) whit the mean of the group
+
+      # define if use normalize or row intensity
+      if(is_norm){
+        data <- self$normalized_data
+        data <- data %>% dplyr::mutate(selected_intensity = norm_intensity)
+      }else{
+        data <- self$filtered_data
+        data <- data %>% dplyr::mutate(selected_intensity = raw_intensity)
+      }
+
+      # perform mean imputation
+      self$mixed_mean_data <- data %>%
+        dplyr::group_by(gene_names, condition) %>%
+        dplyr::mutate(for_mean_imp = dplyr::if_else((sum(bin_intensity) / dplyr::n()) >= 0.75, TRUE, FALSE)) %>%
+        dplyr::mutate(mean_grp = mean(selected_intensity, na.rm = TRUE)) %>%
+        dplyr::ungroup() %>%
+        dplyr::mutate(imp_intensity = dplyr::case_when(
+          bin_intensity == 0 & for_mean_imp ~ mean_grp,
+          TRUE ~ as.numeric(selected_intensity))) %>%
+        dplyr::select(-c(for_mean_imp, mean_grp, selected_intensity))
+    },
+    perseus_imputation = function(is_norm, is_mixed, shift = 1.8, scale = 0.3) {
+
+      # Define if use normalize, mixed or row intensity
+      if(!is_norm & !is_mixed){
+        data <- self$filtered_data
+        data <- data %>% dplyr::mutate(selected_intensity = raw_intensity)
+      }else if(is_norm & !is_mixed){
+        data <- self$normalized_data
+        data <- data %>% dplyr::mutate(selected_intensity = norm_intensity)
+      }else{
+        data <- self$mixed_mean_data
+        data <- data %>% dplyr::mutate(selected_intensity = imp_intensity)
+      }
+
+      ## this funcion perform classical Perseus imputation
+      ## sice use random nomral distibution i will set a set.seed()
+      set.seed(11)
+
+      self$imputed_data <- data %>%
+        # Define statistic to generate the random distribution relative to sample
+        dplyr::mutate(
+          mean = mean(selected_intensity, na.rm = TRUE),
+          sd = sd(selected_intensity, na.rm = TRUE),
+          n = sum(!is.na(selected_intensity)),
+          total = nrow(data) - n
+        ) %>%
+        dplyr::ungroup() %>%
+        # Impute missing values by random draws from a distribution
+        # which is left-shifted by parameter 'shift' * sd and scaled by parameter 'scale' * sd.
+        dplyr::mutate(imp_intensity = dplyr::case_when(
+          is.na(selected_intensity) ~ rnorm(total, mean = (mean - shift * sd), sd = sd * scale),
+          TRUE ~ selected_intensity
+        )) %>%
+        dplyr::select(-c(mean, sd, n, total, selected_intensity))
+    },
+    effect_of_imputation_plot = function(is_imp, is_norm){
+      if(!is_norm & !is_imp){
+        data <- self$filtered_data
+        data <- data %>% dplyr::mutate(plot_intensity = raw_intensity)
+      }else if(is_norm & !is_imp){
+        data <- self$normalized_data
+        data <- data %>% dplyr::mutate(plot_intensity = norm_intensity)
+      }else{
+        data <- self$imputed_data
+        data <- data %>% dplyr::mutate(plot_intensity = imp_intensity)
+      }
+
+      self$imputation_plot <- data %>%
+        dplyr::group_by(condition) %>%
+        echarts4r::e_charts() %>%
+        echarts4r::e_density(
+          plot_intensity,
+          smooth = TRUE,
+          areaStyle = list(opacity = 0),
+          symbol = "none"
+        ) %>%
+        echarts4r::e_theme("QProMS_theme")
     }
   )
 )

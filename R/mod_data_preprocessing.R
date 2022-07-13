@@ -35,7 +35,7 @@ mod_data_preprocessing_ui <- function(id){
           tags$div(
             class="col-3 text-end align-self-end d-flex justify-content-end",
             shiny::actionButton(
-              inputId = "guide",
+              inputId = ns("guide"),
               label = NULL,
               icon = icon("info", class = "fa", lib = "font-awesome"),
               class = "guide-icon"
@@ -49,57 +49,6 @@ mod_data_preprocessing_ui <- function(id){
             )
           )
         ),
-        # tags$div(
-        #   class="row px-4 pt-4 justify-content-around",
-        #   tags$div(
-        #     class="col-4",
-        #     glass_card(
-        #       height = "150px",
-        #       shinyWidgets::prettyCheckbox(inputId = ns("rev"), label = "Reverse", value = TRUE),
-        #       shinyWidgets::prettyCheckbox(inputId = ns("cont"), label = "Contaminant", value = TRUE),
-        #       shinyWidgets::prettyCheckbox(inputId = ns("oibs"), label = "Identify by site", value = TRUE)
-        #     )
-        #   ),
-        #   tags$div(
-        #     class="col-4",
-        #     glass_card(
-        #       height = "150px",
-        #       shiny::selectInput(
-        #         inputId = ns("peptides_type"),
-        #         label = NULL,
-        #         choices = c("peptides", "unique", "razor"),
-        #         selected = "peptides"
-        #       ),
-        #       shiny::sliderInput(
-        #         inputId = ns("slider_peptide_thr"),
-        #         label = NULL,
-        #         min = 0,
-        #         max = 10,
-        #         value = 2
-        #       )
-        #     )
-        #   ),
-        #   # tags$div(
-        #   #   class="col-4",
-        #   #   glass_card(
-        #   #     height = "150px",
-        #   #     shiny::selectInput(
-        #   #       inputId = ns("valid_val_type"),
-        #   #       label = NULL,
-        #   #       choices = c("alog", "each_grp", "total"),
-        #   #       selected = "alog"
-        #   #     ),
-        #   #     shiny::sliderInput(
-        #   #       inputId = ns("slider_valid_val_thr"),
-        #   #       label = NULL,
-        #   #       min = 0,
-        #   #       max = 1,
-        #   #       value = 0.75,
-        #   #       step = 0.05
-        #   #     )
-        #   #   )
-        #   # )
-        # ),
         tags$div(
           class="row p-4",
           tags$div(
@@ -144,9 +93,9 @@ mod_data_preprocessing_ui <- function(id){
               tags$h5(class="m-0 px-4 pt-1 pb-3 text-primary", "Categorical filter"),
               tags$div(
                 class="d-flex flex-row px-4",
-                shinyWidgets::prettyCheckbox(inputId = ns("rev"), label = "Rev", value = TRUE),
-                shinyWidgets::prettyCheckbox(inputId = ns("cont"), label = "Cont", value = TRUE),
-                shinyWidgets::prettyCheckbox(inputId = ns("oibs"), label = "By site", value = TRUE)
+                shinyWidgets::prettySwitch(inputId = ns("rev"), label = "Rev", value = TRUE, fill = TRUE, status = "success"),
+                shinyWidgets::prettySwitch(inputId = ns("cont"), label = "Cont", value = TRUE, fill = TRUE, status = "success"),
+                shinyWidgets::prettySwitch(inputId = ns("oibs"), label = "By site", value = TRUE, fill = TRUE, status = "success")
               ),
               div(
                 class="d-flex justify-content-center px-4 pt-4 pb-1",
@@ -196,14 +145,29 @@ mod_data_preprocessing_server <- function(id, r6){
     observeEvent(input$render, {
 
       if(r6$input_type == "MaxQuant"){
-        r6$pg_wrangling(rev = input$rev,
-                        cont = input$cont,
-                        oibs = input$oibs,
-                        pep_col = input$peptides_type,
-                        pep_thr = input$slider_peptide_thr)
+
+        r6$pg_wrangling(
+          rev = input$rev,
+          cont = input$cont,
+          oibs = input$oibs,
+          pep_col = input$peptides_type,
+          pep_thr = input$slider_peptide_thr
+        )
+
+        r6$filter_valid_val(
+          data = r6$pg_filtered_data,
+          type = input$valid_val_type,
+          thr = input$slider_valid_val_thr
+        )
+      }else{
+        r6$filter_valid_val(
+          data = r6$data, ## da verificare questo, potrei aver bisogno di un data intermedio per generare il pivot long
+          type = input$valid_val_type,
+          thr = input$slider_valid_val_thr
+        )
       }
 
-      r6$filter_valid_val(type = input$valid_val_type, thr = input$slider_valid_val_thr)
+
 
       data <- r6$filtered_data
       expdes <- r6$expdesign
@@ -219,7 +183,7 @@ mod_data_preprocessing_server <- function(id, r6){
         # echarts4r::e_title(text = "Protein per sample", left = "center") %>%
         echarts4r::e_bar(counts) %>%
         echarts4r::e_tooltip(trigger = "item") %>%
-        echarts4r::e_theme("green")
+        echarts4r::e_theme("QProMS_theme")
 
       r6$protein_coverage_plot <- data %>%
         dplyr::group_by(gene_names) %>%
@@ -233,7 +197,7 @@ mod_data_preprocessing_server <- function(id, r6){
         # echarts4r::e_title(text = "Protein coverage", left = "center") %>%
         echarts4r::e_bar(occurrence) %>%
         echarts4r::e_tooltip(trigger = "item") %>%
-        echarts4r::e_theme("green")
+        echarts4r::e_theme("QProMS_theme")
     })
 
     output$plot1 <-  echarts4r::renderEcharts4r({
@@ -248,6 +212,17 @@ mod_data_preprocessing_server <- function(id, r6){
       shiny::req(input$render)
 
       r6$protein_coverage_plot
+    })
+
+    observeEvent(input$guide, {
+      print(input$rev)
+      print(input$cont)
+      print(input$oibs)
+      print(input$peptides_type)
+      print(input$slider_peptide_thr)
+      print(input$valid_val_type)
+      print(input$slider_valid_val_thr)
+      print("------end------")
     })
 
   })
