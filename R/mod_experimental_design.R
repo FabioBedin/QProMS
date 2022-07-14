@@ -12,11 +12,11 @@ mod_experimental_design_ui <- function(id){
   tagList(
     tags$div(
       class="container-xxl",
-      sphere(size = 18, top = 2, left = 20, z_index = 0),
+      sphere(size = 2.5, top = 2, left = 20, z_index = 0),
       tags$div(
         class="glass-container",
-        sphere(size = 13, top = 19, left = 78, z_index = 1),
-        sphere(size = 8, top = 95, left = 30, z_index = 4),
+        sphere(size = 5, top = 19, left = 78, z_index = 1),
+        sphere(size = 3.5, top = 95, left = 30, z_index = 4),
         tags$div(
           class="row px-4",
           tags$div(

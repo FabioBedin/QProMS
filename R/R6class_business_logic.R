@@ -3,26 +3,37 @@
 QProMS <- R6::R6Class(
   classname = "QProMS",
   public = list(
-    # Input parameters
+    ####################
+    # Input parameters #
     data = NULL,
     input_type = NULL,
     intensity_type = NULL,
-    # Parameters for MaxQuant input
+    expdesign = NULL,
+    ################################
+    # Arguments for MaxQuant input #
     pg_data = NULL,
     pg_filtered_data = NULL,
-    #
+    ################################
+    # Arguments for data wrangling #
     filtered_data = NULL,
-    normalized_data = NULL,
-    imputed_data = NULL,
-    mixed_mean_data = NULL,
-    expdesign = NULL,
+    ## plots
     protein_counts_plot = NULL,
     protein_coverage_plot = NULL,
+    ###############################
+    # Arguments for normalization #
+    normalized_data = NULL,
+    is_norm = NULL,
+    vsn_norm_run_once = FALSE,
+    ## plots
     normalization_plot = NULL,
+    ############################
+    # Arguments for imputation #
+    imputed_data = NULL,
+    mixed_mean_data = NULL,
+    is_mixed = NULL,
+    is_imp = NULL,
+    ## plots
     imputation_plot = NULL,
-    is_norm = FALSE,
-    is_mixed = TRUE,
-    is_imp = TRUE,
 
     loading_data = function(data_input, input_type, intensity_type){
       self$data <- data.table::fread(input = data_input$datapath) %>%
@@ -144,36 +155,67 @@ QProMS <- R6::R6Class(
           else dplyr::filter(., all(miss_val <= round(n_size * (1 - thr), 0)))} %>%
         dplyr::select(gene_names, label, condition, replicate, raw_intensity, bin_intensity)
     },
-    vsn_normalization = function(){
+    normalization = function(norm_methods, run_once){
 
-      ## convert tibble data into a matrix
-      raw_matrix <- self$filtered_data %>%
-        tidyr::pivot_wider(id_cols = gene_names,
-                           names_from = label,
-                           values_from = raw_intensity) %>%
-        tibble::column_to_rownames("gene_names") %>%
-        as.matrix()
+      if(is.null(norm_methods)){
+        print("error")# devo ancora fare i test giusti
+      }
 
-      ## Variance stabilization transformation on matrix
-      vsn_fit <- vsn::vsn2(2 ^ raw_matrix, verbose = FALSE)
-      norm_matrix <- vsn::predict(vsn_fit, 2 ^ raw_matrix)
+      if(norm_methods == "None"){
+        data <- self$filtered_data
+        self$is_norm <- FALSE
+        self$normalization_plot <- data %>%
+          dplyr::group_by(condition, label) %>%
+          echarts4r::e_charts() %>%
+          echarts4r::e_title(text = "Intensity distribution", left = "center") %>%
+          echarts4r::e_boxplot(raw_intensity, colorBy="data", layout='horizontal') %>%
+          echarts4r::e_tooltip(trigger = "item") %>%
+          echarts4r::e_theme("QProMS_theme")
+      }else{
+        if(!run_once){
+          self$vsn_norm_run_once <- TRUE
+          ## convert tibble data into a matrix
+          raw_mat <- self$filtered_data
 
-      ## return a table with QProMS object format
-      self$normalized_data <- norm_matrix %>%
-        tibble::as_tibble(rownames = "gene_names") %>%
-        tidyr::pivot_longer(cols = !gene_names,
-                            names_to = "label",
-                            values_to = "norm_intensity") %>%
-        dplyr::full_join(self$filtered_data, .x, by = c("gene_names", "label")) %>%
-        dplyr::relocate(norm_intensity, .after = last_col())
+          raw_matrix <- raw_mat %>%
+            tidyr::pivot_wider(id_cols = gene_names,
+                               names_from = label,
+                               values_from = raw_intensity) %>%
+            tibble::column_to_rownames("gene_names") %>%
+            as.matrix()
+
+          ## Variance stabilization transformation on matrix
+          vsn_fit <- vsn::vsn2(2 ^ raw_matrix, verbose = FALSE)
+          norm_matrix <- vsn::predict(vsn_fit, 2 ^ raw_matrix)
+
+          ## return a table with QProMS object format
+          self$normalized_data <- norm_matrix %>%
+            tibble::as_tibble(rownames = "gene_names") %>%
+            tidyr::pivot_longer(cols = !gene_names,
+                                names_to = "label",
+                                values_to = "norm_intensity") %>%
+            dplyr::full_join(raw_mat, .x, by = c("gene_names", "label")) %>%
+            dplyr::relocate(norm_intensity, .after = last_col())
+        }
+        data <- self$normalized_data
+        self$is_norm <- TRUE
+        self$normalization_plot <- data %>%
+          dplyr::group_by(condition, label) %>%
+          echarts4r::e_charts() %>%
+          echarts4r::e_title(text = "Intensity distribution", left = "center") %>%
+          echarts4r::e_boxplot(norm_intensity, colorBy="data", layout='horizontal') %>%
+          echarts4r::e_tooltip(trigger = "item") %>%
+          echarts4r::e_theme("QProMS_theme")
+      }
+
     },
-    mean_partial_imputation = function(is_norm){
+    mean_partial_imputation = function(){
 
       ## in this function we define row in each group that have more then 75% of valid values
       ## and replace their missing data (MAR) whit the mean of the group
 
       # define if use normalize or row intensity
-      if(is_norm){
+      if(self$is_norm){
         data <- self$normalized_data
         data <- data %>% dplyr::mutate(selected_intensity = norm_intensity)
       }else{
@@ -192,25 +234,27 @@ QProMS <- R6::R6Class(
           TRUE ~ as.numeric(selected_intensity))) %>%
         dplyr::select(-c(for_mean_imp, mean_grp, selected_intensity))
     },
-    perseus_imputation = function(is_norm, is_mixed, shift = 1.8, scale = 0.3) {
+    perseus_imputation = function(shift, scale) {
 
       # Define if use normalize, mixed or row intensity
-      if(!is_norm & !is_mixed){
+      if(!self$is_norm & !self$is_mixed){
         data <- self$filtered_data
         data <- data %>% dplyr::mutate(selected_intensity = raw_intensity)
-      }else if(is_norm & !is_mixed){
+      }else if(self$is_norm & !self$is_mixed){
         data <- self$normalized_data
         data <- data %>% dplyr::mutate(selected_intensity = norm_intensity)
       }else{
+        self$mean_partial_imputation()
         data <- self$mixed_mean_data
         data <- data %>% dplyr::mutate(selected_intensity = imp_intensity)
       }
 
       ## this funcion perform classical Perseus imputation
       ## sice use random nomral distibution i will set a set.seed()
-      set.seed(11)
+      set.seed(111)
 
       self$imputed_data <- data %>%
+        dplyr::group_by(label) %>%
         # Define statistic to generate the random distribution relative to sample
         dplyr::mutate(
           mean = mean(selected_intensity, na.rm = TRUE),
@@ -227,11 +271,12 @@ QProMS <- R6::R6Class(
         )) %>%
         dplyr::select(-c(mean, sd, n, total, selected_intensity))
     },
-    effect_of_imputation_plot = function(is_imp, is_norm){
-      if(!is_norm & !is_imp){
+    effect_of_imputation_plot = function(){
+
+      if(!self$is_norm & !self$is_imp){
         data <- self$filtered_data
         data <- data %>% dplyr::mutate(plot_intensity = raw_intensity)
-      }else if(is_norm & !is_imp){
+      }else if(self$is_norm & !self$is_imp){
         data <- self$normalized_data
         data <- data %>% dplyr::mutate(plot_intensity = norm_intensity)
       }else{

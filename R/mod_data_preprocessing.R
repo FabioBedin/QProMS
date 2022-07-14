@@ -13,11 +13,11 @@ mod_data_preprocessing_ui <- function(id){
     tags$div(
       class="container-xxl",
       ##spheres
-      sphere(size = 20, top = 50, left = 40, z_index = 0),
+      sphere(size = 5, top = 50, left = 40, z_index = 0),
       tags$div(
         class="glass-container",
         ##spheres
-        sphere(size = 13, top = 10, left = 75, z_index = 1),
+        sphere(size = 2, top = 10, left = 75, z_index = 1),
         tags$div(
           class="row px-4",
           tags$div(

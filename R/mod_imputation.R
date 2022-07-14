@@ -13,11 +13,11 @@ mod_imputation_ui <- function(id){
     tags$div(
       class="container-xxl",
       ##spheres
-      sphere(size = 20, top = 50, left = 40, z_index = 0),
+      sphere(size = 7, top = 50, left = 50, z_index = 0),
       tags$div(
         class="glass-container",
         ##spheres
-        sphere(size = 13, top = 10, left = 75, z_index = 1),
+        sphere(size = 1.1, top = 90, left = 55, z_index = 1),
         tags$div(
           class="row px-4",
           tags$div(
@@ -141,22 +141,17 @@ mod_imputation_server <- function(id, r6){
       if(input$imputation_type == "Mixed"){
         r6$is_mixed <- TRUE
         r6$is_imp <- TRUE
-        r6$mean_partial_imputation(is_norm = r6$is_norm)
-        r6$perseus_imputation(is_norm = r6$is_norm, is_mixed = r6$is_mixed, shift = input$shift_thr, scale = input$scale_thr)
-        # plot
-        r6$effect_of_imputation_plot(is_imp = r6$is_imp, is_norm = r6$is_norm)
+        r6$perseus_imputation(shift = input$shift_thr, scale = input$scale_thr)
       }else if(input$imputation_type == "Perseus"){
         r6$is_mixed <- FALSE
         r6$is_imp <- TRUE
-        r6$perseus_imputation(is_norm = r6$is_norm, is_mixed = r6$is_mixed, shift = input$shift_thr, scale = input$scale_thr)
-        # plot
-        r6$effect_of_imputation_plot(is_imp = r6$is_imp, is_norm = r6$is_norm)
-        browser()
+        r6$perseus_imputation(shift = input$shift_thr, scale = input$scale_thr)
       }else{
+        r6$is_mixed <- FALSE
         r6$is_imp <- FALSE
-        # plot
-        r6$effect_of_imputation_plot(is_imp = r6$is_imp, is_norm = r6$is_norm)
       }
+
+      r6$effect_of_imputation_plot()
 
 
     })

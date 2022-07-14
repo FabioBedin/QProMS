@@ -93,7 +93,7 @@
 }
 
 .unique-bg {
-  background-image: repeating-linear-gradient(135deg, rgba(230,226,221, 0.09019607843137255) 0px, rgba(230,226,221, 0.09019607843137255) 1px,transparent 1px, transparent 11px),repeating-linear-gradient(45deg, rgba(230,226,221, 0.09019607843137255) 0px, rgba(230,226,221, 0.09019607843137255) 1px,transparent 1px, transparent 11px),linear-gradient(90deg, rgb(38,34,34),rgb(38,34,34));
+  background-image: radial-gradient(circle, #273b1e, #333219, #362a1c, #302520, #262222);
 }
 
 #fp-nav > ul > li > a > span {

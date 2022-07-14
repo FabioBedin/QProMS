@@ -13,11 +13,11 @@ mod_normalization_ui <- function(id){
     tags$div(
       class="container-xxl",
       ##spheres
-      sphere(size = 20, top = 50, left = 40, z_index = 0),
+      sphere(size = 4, top = 80, left = 60, z_index = 0),
       tags$div(
         class="glass-container",
         ##spheres
-        sphere(size = 13, top = 10, left = 75, z_index = 1),
+        sphere(size = 1, top = 20, left = 35, z_index = 1),
         tags$div(
           class="row px-4",
           tags$div(
@@ -112,24 +112,10 @@ mod_normalization_server <- function(id, r6){
 
       req(input$norm_methods)
 
-      if(input$norm_methods == "None"){
-        data <- r6$filtered_data
-        data <- data %>% dplyr::mutate(plot_intensity = raw_intensity)
-        r6$is_norm <- FALSE
-      } else {
-        r6$vsn_normalization()
-        data <- r6$normalized_data
-        data <- data %>% dplyr::mutate(plot_intensity = norm_intensity)
-        r6$is_norm <- TRUE
-      }
-
-      r6$normalization_plot <- data %>%
-        dplyr::group_by(condition, label) %>%
-        echarts4r::e_charts() %>%
-        echarts4r::e_title(text = "Intensity distribution", left = "center") %>%
-        echarts4r::e_boxplot(plot_intensity, colorBy="data", layout='horizontal') %>%
-        echarts4r::e_tooltip(trigger = "item") %>%
-        echarts4r::e_theme("QProMS_theme")
+      r6$normalization(
+        norm_methods = input$norm_methods,
+        run_once = r6$vsn_norm_run_once
+        )
 
     })
 
