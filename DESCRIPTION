@@ -17,7 +17,8 @@ Imports:
     R6,
     rhandsontable,
     shiny (>= 1.7.1),
-    shinyWidgets
+    shinyWidgets,
+    viridis
 Suggests: 
     spelling,
     testthat (>= 3.0.0)
@@ -26,3 +27,5 @@ Encoding: UTF-8
 Language: en-US
 LazyData: true
 RoxygenNote: 7.2.0
+Depends: 
+    R (>= 2.10)

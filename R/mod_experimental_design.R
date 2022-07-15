@@ -115,6 +115,13 @@ mod_experimental_design_server <- function(id, r6, globalSession){
         expdes <- r6$expdesign
 
         # fare prima dei controlli su exp design
+        n_of_color <- max(expdes %>% dplyr::count(replicate) %>% dplyr::pull(n))
+
+        if(n_of_color==2){
+          n_of_color <- n_of_color + 1
+        }
+
+        r6$color_palette <- viridis::viridis(n = n_of_color, direction = 1)
 
         r6$standardize_pg_data(expdes)
 

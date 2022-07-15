@@ -9,6 +9,7 @@ QProMS <- R6::R6Class(
     input_type = NULL,
     intensity_type = NULL,
     expdesign = NULL,
+    color_palette = NULL,
     ################################
     # Arguments for MaxQuant input #
     pg_data = NULL,
@@ -133,10 +134,7 @@ QProMS <- R6::R6Class(
         ## filter on peptides:
         {if(pep_col == "peptides"){dplyr::filter(., peptides >= pep_thr)}
           else if (pep_col == "unique") {dplyr::filter(., unique_peptides >= pep_thr)}
-          else {dplyr::filter(., razor_unique_peptides >= pep_thr)}} %>%
-        dplyr::select(gene_names, label, condition, replicate, raw_intensity, bin_intensity)
-
-      invisible(self)
+          else {dplyr::filter(., razor_unique_peptides >= pep_thr)}}
     },
     filter_valid_val = function(data, type = "alog", thr){
 
@@ -153,6 +151,7 @@ QProMS <- R6::R6Class(
         ## rage compreso tra 50% e 100% espresso in valori tra 0.5 e 1
         {if(type == "alog") dplyr::filter(., any(miss_val <= round(n_size * (1 - thr), 0)))
           else dplyr::filter(., all(miss_val <= round(n_size * (1 - thr), 0)))} %>%
+        dplyr::ungroup() %>%
         dplyr::select(gene_names, label, condition, replicate, raw_intensity, bin_intensity)
     },
     normalization = function(norm_methods, run_once){
@@ -168,8 +167,14 @@ QProMS <- R6::R6Class(
           dplyr::group_by(condition, label) %>%
           echarts4r::e_charts() %>%
           echarts4r::e_title(text = "Intensity distribution", left = "center") %>%
-          echarts4r::e_boxplot(raw_intensity, colorBy="data", layout='horizontal') %>%
+          echarts4r::e_boxplot(
+            raw_intensity,
+            colorBy = "data",
+            layout = 'horizontal',
+            itemStyle = list(color = "#DADADA", borderWidth = 2)
+          ) %>%
           echarts4r::e_tooltip(trigger = "item") %>%
+          echarts4r::e_color(self$color_palette) %>%
           echarts4r::e_theme("QProMS_theme")
       }else{
         if(!run_once){
@@ -203,8 +208,14 @@ QProMS <- R6::R6Class(
           dplyr::group_by(condition, label) %>%
           echarts4r::e_charts() %>%
           echarts4r::e_title(text = "Intensity distribution", left = "center") %>%
-          echarts4r::e_boxplot(norm_intensity, colorBy="data", layout='horizontal') %>%
+          echarts4r::e_boxplot(
+            norm_intensity,
+            colorBy = "data",
+            layout = 'horizontal',
+            itemStyle = list(color = "#DADADA", borderWidth = 2)
+          ) %>%
           echarts4r::e_tooltip(trigger = "item") %>%
+          echarts4r::e_color(self$color_palette) %>%
           echarts4r::e_theme("QProMS_theme")
       }
 
@@ -251,7 +262,7 @@ QProMS <- R6::R6Class(
 
       ## this funcion perform classical Perseus imputation
       ## sice use random nomral distibution i will set a set.seed()
-      set.seed(111)
+      set.seed(11)
 
       self$imputed_data <- data %>%
         dplyr::group_by(label) %>%
@@ -293,6 +304,7 @@ QProMS <- R6::R6Class(
           areaStyle = list(opacity = 0),
           symbol = "none"
         ) %>%
+        echarts4r::e_color(self$color_palette) %>%
         echarts4r::e_theme("QProMS_theme")
     }
   )

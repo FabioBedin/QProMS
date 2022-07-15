@@ -183,6 +183,7 @@ mod_data_preprocessing_server <- function(id, r6){
         # echarts4r::e_title(text = "Protein per sample", left = "center") %>%
         echarts4r::e_bar(counts) %>%
         echarts4r::e_tooltip(trigger = "item") %>%
+        echarts4r::e_color(r6$color_palette) %>%
         echarts4r::e_theme("QProMS_theme")
 
       r6$protein_coverage_plot <- data %>%
@@ -197,6 +198,7 @@ mod_data_preprocessing_server <- function(id, r6){
         # echarts4r::e_title(text = "Protein coverage", left = "center") %>%
         echarts4r::e_bar(occurrence) %>%
         echarts4r::e_tooltip(trigger = "item") %>%
+        echarts4r::e_color(r6$color_palette) %>%
         echarts4r::e_theme("QProMS_theme")
     })
 
@@ -214,16 +216,16 @@ mod_data_preprocessing_server <- function(id, r6){
       r6$protein_coverage_plot
     })
 
-    observeEvent(input$guide, {
-      print(input$rev)
-      print(input$cont)
-      print(input$oibs)
-      print(input$peptides_type)
-      print(input$slider_peptide_thr)
-      print(input$valid_val_type)
-      print(input$slider_valid_val_thr)
-      print("------end------")
-    })
+    # observeEvent(input$guide, {
+    #   print(input$rev)
+    #   print(input$cont)
+    #   print(input$oibs)
+    #   print(input$peptides_type)
+    #   print(input$slider_peptide_thr)
+    #   print(input$valid_val_type)
+    #   print(input$slider_valid_val_thr)
+    #   print("------end------")
+    # })
 
   })
 }
