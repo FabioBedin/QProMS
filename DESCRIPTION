@@ -17,6 +17,7 @@ Imports:
     R6,
     rhandsontable,
     shiny (>= 1.7.1),
+    shinyjs,
     shinyWidgets,
     viridis
 Suggests: 

@@ -31,7 +31,7 @@ mod_uploading_data_ui <- function(id){
           tags$div(
             class="col-3 text-end align-self-end d-flex justify-content-end",
             shiny::actionButton(
-              inputId = "guide",
+              inputId = ns("guide"),
               label = NULL,
               icon = icon("info", class = "fa", lib = "font-awesome"),
               class = "guide-icon"
@@ -56,8 +56,8 @@ mod_uploading_data_ui <- function(id){
                 inputId = ns("radio_input"),
                 label = NULL,
                 inline = TRUE,
-                choices = c("LFQ", "iBAQ", "Intenisty", "TMT"),
-                selected = "LFQ"
+                choices = c("Intenisty" = "intenisty", "iBAQ" = "ibaq", "LFQ" = "lfq", "TMT" = "tmt"),
+                selected = "lfq"
               ),
               tags$h5(class="m-0 p-3 pb-4 text-primary", "Input type"),
               shiny::radioButtons(
@@ -96,6 +96,7 @@ mod_uploading_data_ui <- function(id){
   )
 }
 
+
 #' uploading_data Server Functions
 #'
 #' @noRd
@@ -108,7 +109,7 @@ mod_uploading_data_server <- function(id, r6){
       req(input$radio_input2)
       req(input$radio_input)
 
-      r6$loading_data(data_input = input$load_from_file, input_type = input$radio_input2, intensity_type = input$radio_input)
+      r6$loading_data(input_path = input$load_from_file$datapath, input_type = input$radio_input2, intensity_type = input$radio_input)
 
       if(input$radio_input2 == "MaxQuant"){
         r6$make_unique_names_pg()
@@ -134,6 +135,14 @@ mod_uploading_data_server <- function(id, r6){
           lengthChange = FALSE),
           style = "bootstrap5")
     })
+
+    observeEvent(input$guide, {
+
+      shinyWidgets::sendSweetAlert(session = session, title = "Tutorial", text = "ciao", type = NULL, html = TRUE)
+
+    })
+
+
 
   })
 }

@@ -88,9 +88,21 @@ mod_normalization_ui <- function(id){
             class="col-9",
             glass_card(
               height = "550px",
-              tags$div(
-                class="p-4",
-                echarts4r::echarts4rOutput(ns("plot1"), height = "500")
+              tabsetPanel(
+                tabPanel(
+                  title = "Distributions",
+                  tags$div(
+                    class="p-4",
+                    echarts4r::echarts4rOutput(ns("plot1"), height = "450")
+                  )
+                ),
+                tabPanel(
+                  title = "Correlation matrix",
+                  tags$div(
+                    class="p-4",
+                    echarts4r::echarts4rOutput(ns("plot2"), height = "450")
+                  )
+                )
               )
             )
           )
@@ -112,10 +124,9 @@ mod_normalization_server <- function(id, r6){
 
       req(input$norm_methods)
 
-      r6$normalization(
-        norm_methods = input$norm_methods,
-        run_once = r6$vsn_norm_run_once
-        )
+      r6$normalization(norm_methods = input$norm_methods, run_once = r6$vsn_norm_run_once)
+
+      r6$correlation_matrix_plot <- r6$correlation_matrix()
 
     })
 
@@ -124,6 +135,13 @@ mod_normalization_server <- function(id, r6){
       shiny::req(input$render)
 
       r6$normalization_plot
+    })
+
+    output$plot2 <-  echarts4r::renderEcharts4r({
+
+      shiny::req(input$render)
+
+      r6$correlation_matrix_plot
     })
 
   })

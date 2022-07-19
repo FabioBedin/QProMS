@@ -35,6 +35,7 @@ app_ui <- function(request) {
         bg = "#262222" # grigio scuro
       ),
 
+
       shinyWidgets::chooseSliderSkin(skin = "Flat", color = "#75BC56"),
       echarts4r::e_theme_register('{"backgroundColor": "#DADADA"}', name = "QProMS_theme"),
       # echarts4r::e_theme_register('{"title": {"textStyle": {"color": "#e6e2dd"}, "subtextStyle": {"color": "#e6e2dd"}}}', name = "QProMS_theme"),
@@ -99,7 +100,9 @@ golem_add_external_resources <- function() {
       path = app_sys("app/www"),
       app_title = "QProMS"
     )
+    # useShinyjs()
     # Add here other external resources
     # for example, you can add shinyalert::useShinyalert()
+    # cicerone::use_cicerone()
   )
 }

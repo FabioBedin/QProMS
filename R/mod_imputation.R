@@ -151,7 +151,7 @@ mod_imputation_server <- function(id, r6){
         r6$is_imp <- FALSE
       }
 
-      r6$effect_of_imputation_plot()
+      r6$effect_of_imputation()
 
 
     })
@@ -160,7 +160,7 @@ mod_imputation_server <- function(id, r6){
 
       shiny::req(input$render)
 
-      r6$imputation_plot
+      r6$effect_of_imputation_plot
     })
 
     output$plot2 <- echarts4r::renderEcharts4r({
@@ -183,7 +183,7 @@ mod_imputation_server <- function(id, r6){
         echarts4r::e_pie(missing_data) %>%
         echarts4r::e_legend(icons = list(icon_absent, icon_present)) %>%
         echarts4r::e_title("Missing data persentage", "Defined across the entire dataset") %>%
-        echarts4r::e_color(c("#440154", "#75BC56")) %>%
+        echarts4r::e_color(c("#440154", "#21918c")) %>%
         echarts4r::e_theme("QProMS_theme")
     })
 

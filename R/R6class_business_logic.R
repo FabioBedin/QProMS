@@ -20,6 +20,7 @@ QProMS <- R6::R6Class(
     ## plots
     protein_counts_plot = NULL,
     protein_coverage_plot = NULL,
+    missing_data_plot = NULL,
     ###############################
     # Arguments for normalization #
     normalized_data = NULL,
@@ -27,6 +28,7 @@ QProMS <- R6::R6Class(
     vsn_norm_run_once = FALSE,
     ## plots
     normalization_plot = NULL,
+    correlation_matrix_plot = NULL,
     ############################
     # Arguments for imputation #
     imputed_data = NULL,
@@ -34,19 +36,22 @@ QProMS <- R6::R6Class(
     is_mixed = NULL,
     is_imp = NULL,
     ## plots
-    imputation_plot = NULL,
+    effect_of_imputation_plot = NULL,
 
-    loading_data = function(data_input, input_type, intensity_type){
-      self$data <- data.table::fread(input = data_input$datapath) %>%
+    loading_data = function(input_path, input_type, intensity_type){
+
+      self$data <- data.table::fread(input = input_path) %>%
         tibble::as_tibble(.name_repair = janitor::make_clean_names)
+
       self$input_type <- input_type
+
       self$intensity_type <- intensity_type
     },
     make_expdesign = function(){
       ## qui mettere tutti gli if in base all'intensity type
       ## per adesso metto solo lfq
       col_names <- self$data %>%
-        dplyr::select(starts_with("lfq_intensity")) %>%
+        dplyr::select(starts_with(self$intensity_type)) %>%
         colnames()
 
       self$expdesign <- data.frame(
@@ -154,6 +159,66 @@ QProMS <- R6::R6Class(
         dplyr::ungroup() %>%
         dplyr::select(gene_names, label, condition, replicate, raw_intensity, bin_intensity)
     },
+    protein_counts = function(data, expdesig){
+      p <- data %>%
+        dplyr::group_by(label) %>%
+        dplyr::summarise(counts = sum(bin_intensity)) %>%
+        dplyr::ungroup() %>%
+        dplyr::inner_join(., expdesig, by = "label") %>%
+        dplyr::mutate(replicate = as.factor(replicate)) %>%
+        dplyr::group_by(condition) %>%
+        echarts4r::e_charts(replicate) %>%
+        # echarts4r::e_title(text = "Protein per sample", left = "center") %>%
+        echarts4r::e_bar(counts) %>%
+        echarts4r::e_x_axis(name = "Replicates") %>%
+        echarts4r::e_y_axis(name = "Counts") %>%
+        echarts4r::e_tooltip(trigger = "item") %>%
+        echarts4r::e_color(self$color_palette) %>%
+        echarts4r::e_theme("QProMS_theme")
+
+      return(p)
+    },
+    protein_coverage = function(data){
+      p <- data %>%
+        dplyr::group_by(gene_names) %>%
+        dplyr::summarise(counts = sum(bin_intensity)) %>%
+        dplyr::ungroup() %>%
+        dplyr::select(counts) %>%
+        table() %>%
+        tibble::as_tibble() %>%
+        dplyr::rename(occurrence = n) %>%
+        echarts4r::e_charts(counts) %>%
+        # echarts4r::e_title(text = "Protein coverage", left = "center") %>%
+        echarts4r::e_bar(occurrence) %>%
+        echarts4r::e_y_axis(name = "Counts") %>%
+        echarts4r::e_tooltip(trigger = "item") %>%
+        echarts4r::e_color(self$color_palette) %>%
+        echarts4r::e_theme("QProMS_theme")
+
+      return(p)
+    },
+    missing_data = function(data){
+      p <- data %>%
+        dplyr::group_by(label) %>%
+        dplyr::mutate(bin_intensity = dplyr::if_else(bin_intensity == 1, "Valid", "Missing")) %>%
+        dplyr::count(bin_intensity) %>%
+        tidyr::pivot_wider(id_cols = label, names_from = bin_intensity, values_from = n) %>%
+        {if(ncol(.) == 2) dplyr::mutate(., Missing = 0)else . } %>%
+        dplyr::ungroup() %>%
+        dplyr::mutate(total = Valid + Missing) %>%
+        dplyr::mutate(perc_present = paste0(round(Valid*100/total, 1), "%")) %>%
+        dplyr::mutate(perc_missing = paste0(round(Missing*100/total, 1), "%")) %>%
+        echarts4r::e_charts(label) %>%
+        echarts4r::e_bar(Valid, stack = "grp", bind = perc_present) %>%
+        echarts4r::e_bar(Missing, stack = "grp", bind = perc_missing) %>%
+        echarts4r::e_x_axis(name = "Samples", axisLabel = list(interval = 0, rotate = 45)) %>%
+        echarts4r::e_y_axis(name = "Counts") %>%
+        echarts4r::e_tooltip(trigger = "item") %>%
+        echarts4r::e_color(c("#21918c", "#440154")) %>%
+        echarts4r::e_theme("QProMS_theme")
+
+      return(p)
+    },
     normalization = function(norm_methods, run_once){
 
       if(is.null(norm_methods)){
@@ -220,6 +285,38 @@ QProMS <- R6::R6Class(
       }
 
     },
+    correlation_matrix = function(){
+      # define if use normalize or row intensity
+      if(self$is_norm){
+        data <- self$normalized_data
+        data <- data %>% dplyr::mutate(selected_intensity = norm_intensity)
+      }else{
+        data <- self$filtered_data
+        data <- data %>% dplyr::mutate(selected_intensity = raw_intensity)
+      }
+
+      p <- data %>%
+        dplyr::select(gene_names, label, selected_intensity) %>%
+        tidyr::pivot_wider(names_from = label, values_from = selected_intensity) %>%
+        dplyr::filter(dplyr::if_all(.cols = dplyr::everything(), .fns = ~ !is.na(.x))) %>%
+        tibble::column_to_rownames("gene_names") %>%
+        cor() %>%
+        echarts4r::e_charts() %>%
+        echarts4r::e_correlations(order = "hclust", visual_map = FALSE) %>%
+        echarts4r::e_x_axis(axisLabel = list(interval = 0, rotate = 45)) %>%
+        echarts4r::e_y_axis(axisLabel = list(interval = 0, rotate = 0), position = "right") %>%
+        echarts4r::e_tooltip() %>%
+        echarts4r::e_title("Correlation matrix", subtext = "Pearson correlation") %>%
+        echarts4r::e_visual_map(
+          min = -1,
+          max = 1,
+          bottom = 150,
+          inRange = list(color = c("#440154", "#31688e", "#35b779"))
+        ) %>%
+        echarts4r::e_theme("QProMS_theme")
+
+      return(p)
+    },
     mean_partial_imputation = function(){
 
       ## in this function we define row in each group that have more then 75% of valid values
@@ -282,7 +379,7 @@ QProMS <- R6::R6Class(
         )) %>%
         dplyr::select(-c(mean, sd, n, total, selected_intensity))
     },
-    effect_of_imputation_plot = function(){
+    effect_of_imputation = function(){
 
       if(!self$is_norm & !self$is_imp){
         data <- self$filtered_data
@@ -295,7 +392,7 @@ QProMS <- R6::R6Class(
         data <- data %>% dplyr::mutate(plot_intensity = imp_intensity)
       }
 
-      self$imputation_plot <- data %>%
+      self$effect_of_imputation_plot <- data %>%
         dplyr::group_by(condition) %>%
         echarts4r::e_charts() %>%
         echarts4r::e_density(

@@ -22,11 +22,6 @@ mod_data_preprocessing_ui <- function(id){
           class="row px-4",
           tags$div(
             class="col-3 text-start align-self-end"
-            # shiny::actionButton(
-            #   inputId = ns("render"),
-            #   label = "Render Plots",
-            #   class = "render-plot-btn"
-            # )
           ),
           tags$div(
             class="col-6 text-center",
@@ -125,6 +120,13 @@ mod_data_preprocessing_ui <- function(id){
                     class="p-4",
                     echarts4r::echarts4rOutput(ns("plot2"), height = "450")
                   )
+                ),
+                tabPanel(
+                  title = "Missing data",
+                  tags$div(
+                    class="p-4",
+                    echarts4r::echarts4rOutput(ns("plot3"), height = "450")
+                  )
                 )
               )
             )
@@ -172,34 +174,11 @@ mod_data_preprocessing_server <- function(id, r6){
       data <- r6$filtered_data
       expdes <- r6$expdesign
 
-      r6$protein_counts_plot <- data %>%
-        dplyr::group_by(label) %>%
-        dplyr::summarise(counts = sum(bin_intensity)) %>%
-        dplyr::ungroup() %>%
-        dplyr::inner_join(., expdes, by = "label") %>%
-        dplyr::mutate(replicate = as.factor(replicate)) %>%
-        dplyr::group_by(condition) %>%
-        echarts4r::e_charts(replicate) %>%
-        # echarts4r::e_title(text = "Protein per sample", left = "center") %>%
-        echarts4r::e_bar(counts) %>%
-        echarts4r::e_tooltip(trigger = "item") %>%
-        echarts4r::e_color(r6$color_palette) %>%
-        echarts4r::e_theme("QProMS_theme")
+      r6$protein_counts_plot <- r6$protein_counts(data, expdes)
 
-      r6$protein_coverage_plot <- data %>%
-        dplyr::group_by(gene_names) %>%
-        dplyr::summarise(counts = sum(bin_intensity)) %>%
-        dplyr::ungroup() %>%
-        dplyr::select(counts) %>%
-        table() %>%
-        tibble::as_tibble() %>%
-        dplyr::rename(occurrence = n) %>%
-        echarts4r::e_charts(counts) %>%
-        # echarts4r::e_title(text = "Protein coverage", left = "center") %>%
-        echarts4r::e_bar(occurrence) %>%
-        echarts4r::e_tooltip(trigger = "item") %>%
-        echarts4r::e_color(r6$color_palette) %>%
-        echarts4r::e_theme("QProMS_theme")
+      r6$protein_coverage_plot <- r6$protein_coverage(data)
+
+      r6$missing_data_plot <- r6$missing_data(data)
     })
 
     output$plot1 <-  echarts4r::renderEcharts4r({
@@ -214,6 +193,13 @@ mod_data_preprocessing_server <- function(id, r6){
       shiny::req(input$render)
 
       r6$protein_coverage_plot
+    })
+
+    output$plot3 <-  echarts4r::renderEcharts4r({
+
+      shiny::req(input$render)
+
+      r6$missing_data_plot
     })
 
     # observeEvent(input$guide, {
