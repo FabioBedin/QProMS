@@ -79,31 +79,6 @@ mod_experimental_design_server <- function(id, r6, globalSession){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
 
-    # output$expdesign_table = DT::renderDataTable({
-    #   # req(input$save_expdesign)
-    #   gargoyle::watch("make_expdesign")
-    #   r6$expdesign
-    #   }, selection = 'none', rownames = FALSE, editable = 'all', options = list(pageLength = nrow(r6$expdesign)))
-    #
-    # proxy = DT::dataTableProxy('expdesign_table', session = globalSession)
-    #
-    # observeEvent(input$expdesign_table_cell_edit, {
-    #
-    #   r6$expdesign <<- DT::editData(data = r6$expdesign,
-    #                                 info = input$expdesign_table_cell_edit,
-    #                                 rownames = FALSE,
-    #                                 proxy = proxy)
-    # })
-    #
-    # observeEvent(input$save_expdesign, {
-    #
-    #   expdes <- r6$expdesign
-    #
-    #   # fare prima dei controlli su exp design
-    #
-    #   r6$standardize_pg_data(expdes)
-    # })
-
     observeEvent(input$save_expdesign, {
 
       req(input$expdesign_table)

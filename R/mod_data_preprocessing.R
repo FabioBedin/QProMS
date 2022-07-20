@@ -154,6 +154,7 @@ mod_data_preprocessing_server <- function(id, r6){
           oibs = input$oibs,
           pep_col = input$peptides_type,
           pep_thr = input$slider_peptide_thr
+          # rescue_cont = input$cont_vector
         )
 
         r6$filter_valid_val(
@@ -203,14 +204,29 @@ mod_data_preprocessing_server <- function(id, r6){
     })
 
     # observeEvent(input$guide, {
-    #   print(input$rev)
-    #   print(input$cont)
-    #   print(input$oibs)
-    #   print(input$peptides_type)
-    #   print(input$slider_peptide_thr)
-    #   print(input$valid_val_type)
-    #   print(input$slider_valid_val_thr)
-    #   print("------end------")
+    #
+    #   shiny::req(input$render)
+    #
+    #   rescue_cont <- data %>%
+    #     dplyr::filter(potential_contaminant == "+") %>%
+    #     dplyr::distinct(gene_names) %>%
+    #     dplyr::pull()
+    #
+    #
+    #   shinyWidgets::sendSweetAlert(
+    #     session = session,
+    #     title = "Tutorial",
+    #     text = shinyWidgets::pickerInput(
+    #       inputId = "cont_vector",
+    #       label = "Select contaminant to rescue",
+    #       choices = LETTERS,
+    #       options = list(`live-search` = TRUE, `actions-box` = TRUE),
+    #       multiple = TRUE
+    #     ),
+    #     type = NULL,
+    #     html = TRUE
+    #   )
+    #
     # })
 
   })

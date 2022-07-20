@@ -13,6 +13,7 @@ QProMS <- R6::R6Class(
     ################################
     # Arguments for MaxQuant input #
     pg_data = NULL,
+    pg_data_standard = NULL,
     pg_filtered_data = NULL,
     ################################
     # Arguments for data wrangling #
@@ -49,7 +50,6 @@ QProMS <- R6::R6Class(
     },
     make_expdesign = function(){
       ## qui mettere tutti gli if in base all'intensity type
-      ## per adesso metto solo lfq
       col_names <- self$data %>%
         dplyr::select(starts_with(self$intensity_type)) %>%
         colnames()
@@ -87,7 +87,7 @@ QProMS <- R6::R6Class(
 
       ## update self$data that now don't have dupe or missing spot
       self$pg_data <-
-        dplyr::left_join(self$data, list_unique_gene_names, by = "id") %>%
+        dplyr::left_join(data_list, list_unique_gene_names, by = "id") %>%
         dplyr::mutate(
           gene_names = dplyr::case_when(unique_gene_names != "" ~ unique_gene_names,
                                         TRUE ~ gene_names)
@@ -97,7 +97,9 @@ QProMS <- R6::R6Class(
     },
     standardize_pg_data = function(expdesign){
       ## cambiare il self data
-      self$pg_data <- self$pg_data %>%
+      data <- self$pg_data
+
+      self$pg_data_standard <- data %>%
         dplyr::select(
           gene_names,
           dplyr::all_of(expdesign$key),
@@ -125,13 +127,13 @@ QProMS <- R6::R6Class(
         dplyr::mutate(bin_intensity = dplyr::if_else(is.na(raw_intensity), 0, 1)) %>%
         dplyr::select(-key)
     },
-    pg_wrangling = function(rev = TRUE,
-                            cont = TRUE,
-                            oibs = TRUE,
+    pg_wrangling = function(rev = TRUE, cont = TRUE, oibs = TRUE,
                             pep_col = "peptides", ## c("peptides", "unique", "razor")
-                            pep_thr = 2) {
+                            pep_thr = 2, rescue_cont = NULL) {
 
-      self$pg_filtered_data <- self$pg_data %>%
+      self$pg_filtered_data <- self$pg_data_standard %>%
+        dplyr::mutate(potential_contaminant = dplyr::case_when(
+          gene_names %in% rescue_cont ~ "", TRUE ~ potential_contaminant)) %>%
         ## remove reverse, potentialcontaminant and oibs from data base on user input
         {if(rev)dplyr::filter(., !reverse == "+") else .} %>%
         {if(cont)dplyr::filter(., !potential_contaminant == "+") else .} %>%

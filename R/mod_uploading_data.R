@@ -56,7 +56,7 @@ mod_uploading_data_ui <- function(id){
                 inputId = ns("radio_input"),
                 label = NULL,
                 inline = TRUE,
-                choices = c("Intenisty" = "intenisty", "iBAQ" = "ibaq", "LFQ" = "lfq", "TMT" = "tmt"),
+                choices = c("Intensity" = "intensity", "iBAQ" = "ibaq", "LFQ" = "lfq", "TMT" = "tmt"),
                 selected = "lfq"
               ),
               tags$h5(class="m-0 p-3 pb-4 text-primary", "Input type"),
@@ -109,7 +109,11 @@ mod_uploading_data_server <- function(id, r6){
       req(input$radio_input2)
       req(input$radio_input)
 
-      r6$loading_data(input_path = input$load_from_file$datapath, input_type = input$radio_input2, intensity_type = input$radio_input)
+      r6$loading_data(
+        input_path = input$load_from_file$datapath,
+        input_type = input$radio_input2,
+        intensity_type = input$radio_input
+      )
 
       if(input$radio_input2 == "MaxQuant"){
         r6$make_unique_names_pg()
@@ -123,11 +127,12 @@ mod_uploading_data_server <- function(id, r6){
 
     output$preview_table = DT::renderDT({
       req(input$preview_upload_data)
+      req(input$radio_input)
 
       table <- r6$data
 
       table %>%
-        dplyr::select(gene_names, starts_with("lfq_intensity")) %>%
+        dplyr::select(gene_names, starts_with(input$radio_input)) %>%
         DT::datatable(options = list(
           columnDefs = list(list(className = 'dt-center', width = '200px', targets = '_all')),
           scrollX = 500,
@@ -138,7 +143,7 @@ mod_uploading_data_server <- function(id, r6){
 
     observeEvent(input$guide, {
 
-      shinyWidgets::sendSweetAlert(session = session, title = "Tutorial", text = "ciao", type = NULL, html = TRUE)
+      shinyWidgets::sendSweetAlert(session = session, title = "Tutorial", text = print(input$radio_input), type = NULL, html = TRUE)
 
     })
 
