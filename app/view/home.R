@@ -100,7 +100,8 @@ ui <- function(id) {
               "search engine results (MaxQuant, FragPipe, Spectronaut, ",
               "DIA-NN) as well as custom result tables. The application ",
               "exploit high-quality interactive figures, produce HTML ", 
-              "reports and parameter files for sharing and reproducing results."
+              "reports and parameter files for sharing and reproducing results.
+              Documentation and code available at https://github.com/ieoresearch/QProMS"
             )
           )
         )
